@@ -3874,3 +3874,123 @@ body{
       #121817;
   }
 }
+
+
+/* ---------- contained forge-flame effect for Mark done ---------- */
+
+.complete-action>span{
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;
+}
+
+.complete-action>span::before,
+.complete-action>span::after{
+  content:"";
+  position:absolute;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* Broad flame tongues, built from layered ellipses and clipped by the button. */
+.complete-action>span::before{
+  left:-8%;
+  right:-8%;
+  bottom:-56%;
+  height:145%;
+  background:
+    radial-gradient(ellipse at 8% 100%, rgba(255,205,94,.95) 0 8%, rgba(232,112,48,.72) 18%, transparent 42%),
+    radial-gradient(ellipse at 24% 100%, rgba(255,225,128,.92) 0 7%, rgba(238,126,51,.70) 18%, transparent 40%),
+    radial-gradient(ellipse at 43% 100%, rgba(255,190,67,.92) 0 9%, rgba(214,80,35,.72) 21%, transparent 43%),
+    radial-gradient(ellipse at 61% 100%, rgba(255,221,116,.92) 0 7%, rgba(240,119,43,.70) 19%, transparent 41%),
+    radial-gradient(ellipse at 79% 100%, rgba(255,181,57,.90) 0 9%, rgba(203,69,31,.70) 21%, transparent 43%),
+    radial-gradient(ellipse at 96% 100%, rgba(255,213,101,.88) 0 7%, rgba(231,104,42,.66) 18%, transparent 39%);
+  filter:blur(4px) saturate(1.08);
+  mix-blend-mode:screen;
+  opacity:.72;
+  transform-origin:50% 100%;
+  animation:valheimFlameLick 1.35s ease-in-out infinite alternate;
+}
+
+/* Sparse rising embers. */
+.complete-action>span::after{
+  inset:0;
+  background:
+    radial-gradient(circle, rgba(255,221,141,.95) 0 1px, transparent 1.7px) 7px 74px / 47px 61px,
+    radial-gradient(circle, rgba(237,126,56,.88) 0 1.1px, transparent 1.8px) 28px 61px / 73px 79px,
+    radial-gradient(circle, rgba(255,178,77,.78) 0 .9px, transparent 1.6px) 14px 92px / 91px 68px;
+  opacity:.34;
+  animation:valheimEmberRise 2.7s linear infinite;
+}
+
+/* Keep UI content above the effect. */
+.complete-action>span>b,
+.complete-action>span>strong,
+.complete-action>span>small{
+  position:relative;
+  z-index:2;
+}
+
+.complete-action:hover>span::before{
+  opacity:.88;
+}
+
+/* Completion extinguishes the fire. */
+.complete-action input:checked + span::before,
+.complete-action input:checked + span::after{
+  opacity:0;
+  animation:none;
+}
+
+@keyframes valheimFlameLick{
+  0%{
+    transform:translate3d(-1.5%,4%,0) scaleX(.98) scaleY(.88) skewX(-2deg);
+  }
+  35%{
+    transform:translate3d(1%,-1%,0) scaleX(1.03) scaleY(1.03) skewX(2deg);
+  }
+  70%{
+    transform:translate3d(-.5%,-4%,0) scaleX(1.01) scaleY(1.12) skewX(-1deg);
+  }
+  100%{
+    transform:translate3d(1.5%,-2%,0) scaleX(.99) scaleY(1.05) skewX(2deg);
+  }
+}
+
+@keyframes valheimEmberRise{
+  0%{
+    background-position:7px 78px,28px 68px,14px 98px;
+    opacity:.12;
+  }
+  22%{
+    opacity:.38;
+  }
+  100%{
+    background-position:7px -48px,28px -62px,14px -38px;
+    opacity:0;
+  }
+}
+
+@media(max-width:560px){
+  .complete-action>span::before{
+    bottom:-62%;
+    height:155%;
+    filter:blur(3.5px) saturate(1.05);
+  }
+
+  .complete-action>span::after{
+    opacity:.27;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .complete-action>span::before,
+  .complete-action>span::after{
+    animation:none;
+  }
+
+  .complete-action>span::before{
+    transform:none;
+    opacity:.48;
+  }
+}
