@@ -309,6 +309,67 @@
     return chosen.map(([,value]) => value);
   }
 
+  function objectiveText(m) {
+    const title = String(m.title || "").replace(/^\d+\.\s*/, "").trim();
+    const action = String(m.do || "").trim();
+    if (!action) return title;
+    if (!title) return action;
+
+    // Remove station-level prefixes when deciding whether the action already
+    // contains the actual thing being built/crafted.
+    const subjectTitle = title
+      .replace(/^(Workbench|Forge|Cauldron)\s+Lv\.\s*\d+\s*[—–-]\s*/i, "")
+      .replace(/^Deep North station extensions$/i, "station extensions")
+      .trim();
+
+    const stop = new Set([
+      "a","an","the","and","or","to","of","for","from","with","at","in","on","near",
+      "your","my","all","first","available","relevant","only","into","then","them",
+      "build","craft","make","collect","find","take","use","equip","gain","establish",
+      "raid","defeat","prepare","acquire","reach","brew","transport","clear","finish",
+      "choose","stock","open","smelt","harvest","hunt","explore","buy","place","push",
+      "prioritize","create","secure","unlock","assemble","enter","win","land","sail"
+    ]);
+
+    const tokens = text => String(text)
+      .toLowerCase()
+      .replace(/[^a-z0-9+]+/g, " ")
+      .split(/\s+/)
+      .filter(w => w.length > 2 && !stop.has(w));
+
+    const titleTokens = tokens(subjectTitle);
+    const actionTokens = new Set(tokens(action));
+    const missingSubject = titleTokens.filter(w => !actionTokens.has(w));
+
+    // If the action already names the important subject, it is normally the
+    // clearer, more imperative sentence.
+    if (!missingSubject.length) {
+      return action.length >= title.length * 0.72 ? action : title;
+    }
+
+    const firstTitleVerb = (title.match(/^([A-Za-z]+)/) || [])[1]?.toLowerCase();
+    const firstActionVerb = (action.match(/^([A-Za-z]+)/) || [])[1]?.toLowerCase();
+
+    // Natural merge for cases such as:
+    // "Craft the Antler Pickaxe" + "Craft at Workbench"
+    // "Build a Karve" + "Build near water".
+    if (firstTitleVerb && firstTitleVerb === firstActionVerb) {
+      const tail = action.replace(/^[A-Za-z]+\s*/,"").trim();
+      if (/^(at|near|within|under|beside|by|with|from|using|over)\b/i.test(tail)) {
+        return `${title} ${tail}`;
+      }
+
+      // If the second phrase only repeats the same object, keep the richer title.
+      const tailTokens = tokens(tail);
+      if (tailTokens.every(w => titleTokens.includes(w))) return title;
+    }
+
+    // One objective, not a duplicated title/subtitle: preserve the specific
+    // object from the title and append the useful execution detail.
+    const lowerAction = action.charAt(0).toLowerCase() + action.slice(1);
+    return `${title} — ${lowerAction}`;
+  }
+
   function initMarkDoneFire() {
     const surface = document.querySelector(".complete-action > span");
     const input = document.querySelector(".current-check");
@@ -583,7 +644,7 @@
     </div>
     <article class="quest-card compact-quest" id="currentQuest" style="--biomeColor:${m.stage.color};--biomeTint:${m.stage.tint}">
       <header class="compact-quest-head">
-        <h2 class="objective-main">${m.do}</h2>
+        <h2 class="objective-main">${objectiveText(m)}</h2>
       </header>
 
       <div class="compact-quest-body">
@@ -609,7 +670,7 @@
             <div class="section-label">QUICK CHECKLIST</div>
             <ol class="action-steps">
               <li><span>1</span><div><strong>Prepare</strong><p>Gather the requirements listed above.</p></div></li>
-              <li><span>2</span><div><strong>Execute</strong><p>${m.do}.</p></div></li>
+              <li><span>2</span><div><strong>Execute</strong><p>${objectiveText(m)}.</p></div></li>
               <li><span>3</span><div><strong>Confirm</strong><p>Mark it done when the objective is finished in your world.</p></div></li>
             </ol>
           </div>
@@ -628,7 +689,7 @@
               <div class="acquisition-grid">
                 ${guides.map(([name,tip]) => `<div class="acquisition"><div class="acquisition-name">${name}</div><p>${tip}</p></div>`).join("")}
               </div>`
-            : `<div class="acquisition fallback"><div class="acquisition-name">Follow the previous unlock</div><p>${m.summary} Your immediate action is: ${m.do}.</p></div>`}
+            : `<div class="acquisition fallback"><div class="acquisition-name">Follow the previous unlock</div><p>${m.summary} Your immediate action is: ${objectiveText(m)}.</p></div>`}
           </div>
         </details>
       </div>
