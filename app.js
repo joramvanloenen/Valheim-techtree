@@ -401,27 +401,36 @@
           uv.y * 10.0 - t * 1.45
         ));
 
-        // Tall narrow pockets emerge naturally from the stretched noise field.
-        float pockets = smoothstep(0.54, 0.79, coarse * 0.78 + fine * 0.22);
+        // Open the mask enough that fire is always visible, while noise still
+        // determines where taller licks form.
+        float pockets = smoothstep(0.34, 0.68, coarse * 0.72 + fine * 0.28);
 
-        // Strong base, rapidly tapering upward. Occasional noise lifts produce flame licks.
         float baseHeight =
-          (1.0 - uv.y) * 1.16 +
-          (coarse - 0.5) * 0.38 +
-          (fine - 0.5) * 0.12;
+          (1.0 - uv.y) * 1.03 +
+          coarse * 0.46 +
+          fine * 0.14;
 
-        float flame = smoothstep(0.78, 1.02, baseHeight) * pockets;
-        flame *= 1.0 - smoothstep(0.50, 0.90, uv.y);
-        flame *= smoothstep(-0.04, 0.07, uv.y);
+        float licks = smoothstep(0.93, 1.25, baseHeight) * pockets;
+        licks *= 1.0 - smoothstep(0.48, 0.88, uv.y);
+
+        // Guaranteed low forge bed. This prevents the effect from disappearing
+        // when the turbulent flame mask happens to be sparse.
+        float emberNoise = 0.68 + 0.32 * noise(vec2(uv.x * 18.0 - t * 0.28, t * 1.7));
+        float fireBed = (1.0 - smoothstep(0.02, 0.22, uv.y)) * emberNoise;
+
+        float flame = max(licks, fireBed * 0.82);
+        flame *= smoothstep(-0.03, 0.055, uv.y);
 
         float core =
-          smoothstep(0.94, 1.14, baseHeight) *
-          smoothstep(0.60, 0.86, pockets) *
-          (1.0 - smoothstep(0.0, 0.40, uv.y));
+          max(
+            smoothstep(1.05, 1.33, baseHeight) * pockets,
+            fireBed * 0.58
+          ) *
+          (1.0 - smoothstep(0.0, 0.39, uv.y));
 
         float rim =
-          (smoothstep(0.70, 0.86, baseHeight) -
-           smoothstep(0.96, 1.08, baseHeight)) *
+          (smoothstep(0.84, 1.00, baseHeight) -
+           smoothstep(1.14, 1.30, baseHeight)) *
           pockets;
 
         vec3 ember = vec3(0.47, 0.075, 0.018);
