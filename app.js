@@ -321,11 +321,7 @@
     </div>
     <article class="quest-card compact-quest" id="currentQuest" style="--biomeColor:${m.stage.color};--biomeTint:${m.stage.tint}">
       <header class="compact-quest-head">
-        <h2>${m.title}</h2>
-        <div class="essential-action">
-          <span>DO</span>
-          <strong>${m.do}</strong>
-        </div>
+        <h2 class="objective-main">${m.do}</h2>
       </header>
 
       <div class="compact-quest-body">
