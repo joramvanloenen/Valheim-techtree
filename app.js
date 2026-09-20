@@ -314,182 +314,261 @@
     const input = document.querySelector(".current-check");
     if (!surface || !input || input.checked) return;
 
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      surface.classList.add("fire-static");
+      return;
+    }
+
     const canvas = document.createElement("canvas");
     canvas.className = "markdone-fire";
     canvas.setAttribute("aria-hidden", "true");
     surface.prepend(canvas);
 
-    const ctx = canvas.getContext("2d", {alpha:true});
-    if (!ctx) {
+    const gl = canvas.getContext("webgl", {
+      alpha:true,
+      antialias:false,
+      depth:false,
+      stencil:false,
+      premultipliedAlpha:true,
+      powerPreference:"low-power"
+    });
+
+    if (!gl) {
       canvas.remove();
       surface.classList.add("fire-static");
       return;
     }
 
-    const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    let width = 1;
-    let height = 1;
-    let dpr = 1;
+    const vertexSource = `
+      attribute vec2 a_position;
+      varying vec2 v_uv;
 
-    function seeded(seed) {
-      const x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
-      return x - Math.floor(x);
+      void main() {
+        v_uv = a_position * 0.5 + 0.5;
+        gl_Position = vec4(a_position, 0.0, 1.0);
+      }
+    `;
+
+    const fragmentSource = `
+      precision mediump float;
+
+      varying vec2 v_uv;
+      uniform float u_time;
+      uniform vec2 u_resolution;
+
+      float hash(vec2 p) {
+        p = fract(p * vec2(123.34, 456.21));
+        p += dot(p, p + 45.32);
+        return fract(p.x * p.y);
+      }
+
+      float noise(vec2 p) {
+        vec2 i = floor(p);
+        vec2 f = fract(p);
+        f = f * f * (3.0 - 2.0 * f);
+
+        float a = hash(i);
+        float b = hash(i + vec2(1.0, 0.0));
+        float c = hash(i + vec2(0.0, 1.0));
+        float d = hash(i + vec2(1.0, 1.0));
+
+        return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+      }
+
+      float fbm(vec2 p) {
+        float v = 0.0;
+        float a = 0.5;
+
+        for (int i = 0; i < 5; i++) {
+          v += a * noise(p);
+          p = p * 2.02 + vec2(17.17, 9.23);
+          a *= 0.5;
+        }
+
+        return v;
+      }
+
+      void main() {
+        vec2 uv = v_uv;
+        float t = u_time;
+
+        // Three vertically stretched noise layers moving upward at different speeds.
+        float slow = fbm(vec2(
+          uv.x * 6.0,
+          uv.y * 2.45 - t * 0.34
+        ));
+
+        float warp = fbm(vec2(
+          uv.x * 4.2 + 8.3,
+          uv.y * 2.0 - t * 0.22
+        ));
+
+        float mid = fbm(vec2(
+          uv.x * 12.0 + (warp - 0.5) * 1.8,
+          uv.y * 4.9 - t * 0.72
+        ));
+
+        float fine = fbm(vec2(
+          uv.x * 24.0 + (mid - 0.5) * 1.05,
+          uv.y * 9.4 - t * 1.28
+        ));
+
+        // Narrower vertical pockets come from the higher-frequency layers,
+        // while the low-frequency layer keeps the overall motion cohesive.
+        float turbulence =
+          slow * 0.48 +
+          mid * 0.34 +
+          fine * 0.18;
+
+        float breakup = smoothstep(0.30, 0.72, mid * 0.72 + fine * 0.28);
+        turbulence *= 0.72 + breakup * 0.48;
+
+        // Continuous flame field: strong at the bottom and progressively
+        // harder for noise to keep alive toward the top.
+        float vertical = 1.0 - uv.y;
+        float field =
+          vertical * 0.98 +
+          turbulence * 0.78;
+
+        float flame = smoothstep(0.69, 1.02, field);
+
+        // Softly taper the very top so the fire stays contained inside the button.
+        flame *= 1.0 - smoothstep(0.67, 0.98, uv.y);
+
+        // Bright inner heat is derived from the same noise field, so it stays
+        // attached to the flame instead of looking like separate sprites.
+        float core = smoothstep(0.91, 1.17, field) * flame;
+        core *= 1.0 - smoothstep(0.42, 0.80, uv.y);
+
+        float edge = smoothstep(0.56, 0.76, field) - smoothstep(0.92, 1.10, field);
+        edge *= 1.0 - smoothstep(0.58, 0.95, uv.y);
+
+        // Warm Valheim-like forge palette.
+        vec3 darkEmber = vec3(0.30, 0.045, 0.014);
+        vec3 redOrange = vec3(0.78, 0.16, 0.035);
+        vec3 orange = vec3(1.00, 0.36, 0.055);
+        vec3 amber = vec3(1.00, 0.69, 0.20);
+        vec3 hot = vec3(1.00, 0.91, 0.57);
+
+        vec3 color = mix(darkEmber, redOrange, clamp(flame * 1.15 + edge * 0.30, 0.0, 1.0));
+        color = mix(color, orange, clamp(flame * 0.82, 0.0, 1.0));
+        color = mix(color, amber, clamp(core * 0.92, 0.0, 1.0));
+        color = mix(color, hot, clamp(core * core * 0.55, 0.0, 1.0));
+
+        float flicker = 0.90 + 0.10 * noise(vec2(uv.x * 16.0, t * 1.7));
+        float alpha = clamp((flame * 0.80 + core * 0.18) * flicker, 0.0, 0.90);
+
+        gl_FragColor = vec4(color * alpha, alpha);
+      }
+    `;
+
+    function compile(type, source) {
+      const shader = gl.createShader(type);
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        gl.deleteShader(shader);
+        return null;
+      }
+
+      return shader;
     }
 
-    // Fewer, larger flame tongues. They stay alive continuously rather than
-    // spawning as tiny particles, which keeps the effect readable on mobile.
-    const flames = Array.from({length:11}, (_, i) => ({
-      x: 0.05 + (i / 10) * 0.90 + (seeded(i + 2) - 0.5) * 0.035,
-      phase: seeded(i + 41) * Math.PI * 2,
-      speed: 0.82 + seeded(i + 71) * 0.55,
-      width: 0.045 + seeded(i + 101) * 0.028,
-      height: 0.42 + seeded(i + 131) * 0.30,
-      sway: 0.018 + seeded(i + 161) * 0.020,
-      lean: (seeded(i + 191) - 0.5) * 0.06
-    }));
+    const vs = compile(gl.VERTEX_SHADER, vertexSource);
+    const fs = compile(gl.FRAGMENT_SHADER, fragmentSource);
+
+    if (!vs || !fs) {
+      canvas.remove();
+      surface.classList.add("fire-static");
+      return;
+    }
+
+    const program = gl.createProgram();
+    gl.attachShader(program, vs);
+    gl.attachShader(program, fs);
+    gl.linkProgram(program);
+    gl.deleteShader(vs);
+    gl.deleteShader(fs);
+
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      gl.deleteProgram(program);
+      canvas.remove();
+      surface.classList.add("fire-static");
+      return;
+    }
+
+    gl.useProgram(program);
+
+    const position = gl.getAttribLocation(program, "a_position");
+    const timeLoc = gl.getUniformLocation(program, "u_time");
+    const resolutionLoc = gl.getUniformLocation(program, "u_resolution");
+
+    const buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+      -1,-1, 1,-1, -1,1,
+      -1,1, 1,-1, 1,1
+    ]), gl.STATIC_DRAW);
+
+    gl.enableVertexAttribArray(position);
+    gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
 
     function resize() {
       const rect = surface.getBoundingClientRect();
-      width = Math.max(1, rect.width);
-      height = Math.max(1, rect.height);
-      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      const w = Math.max(2, Math.round(width * dpr));
-      const h = Math.max(2, Math.round(height * dpr));
+      const scale = Math.min(window.devicePixelRatio || 1, 1.25) * 0.78;
+      const w = Math.max(2, Math.min(620, Math.round(rect.width * scale)));
+      const h = Math.max(2, Math.min(150, Math.round(rect.height * scale)));
+
       if (canvas.width !== w || canvas.height !== h) {
         canvas.width = w;
         canvas.height = h;
-        canvas.style.width = width + "px";
-        canvas.style.height = height + "px";
+        gl.viewport(0, 0, w, h);
       }
     }
 
-    function flamePath(x, baseY, w, h, bend, pinch) {
-      const tipX = x + bend;
-      const tipY = baseY - h;
-
-      ctx.beginPath();
-      ctx.moveTo(x - w * 0.52, baseY);
-      ctx.bezierCurveTo(
-        x - w * 0.74,
-        baseY - h * 0.28,
-        tipX - w * (0.20 + pinch),
-        tipY + h * 0.30,
-        tipX,
-        tipY
-      );
-      ctx.bezierCurveTo(
-        tipX + w * (0.16 + pinch * 0.7),
-        tipY + h * 0.27,
-        x + w * 0.70,
-        baseY - h * 0.25,
-        x + w * 0.52,
-        baseY
-      );
-      ctx.closePath();
-    }
-
-    function draw(now) {
-      if (!canvas.isConnected) return;
-      if (input.checked) {
-        canvas.classList.add("is-extinguished");
-        return;
-      }
-
-      resize();
-      ctx.setTransform(dpr,0,0,dpr,0,0);
-      ctx.clearRect(0,0,width,height);
-
-      const t = now * 0.001;
-
-      // Soft furnace glow at the base, deliberately broad but dim.
-      const glow = ctx.createLinearGradient(0,height,0,height * 0.44);
-      glow.addColorStop(0,"rgba(255,111,35,.45)");
-      glow.addColorStop(0.22,"rgba(210,67,28,.19)");
-      glow.addColorStop(1,"rgba(111,34,23,0)");
-      ctx.fillStyle = glow;
-      ctx.fillRect(0,height * 0.42,width,height * 0.58);
-
-      ctx.save();
-      ctx.globalCompositeOperation = "lighter";
-      ctx.filter = "blur(3.2px)";
-
-      // Outer, smoky-orange flame bodies.
-      flames.forEach((f,i) => {
-        const pulse = 0.88 + Math.sin(t * f.speed * 2.0 + f.phase) * 0.12;
-        const h = height * f.height * pulse;
-        const w = Math.max(14, width * f.width);
-        const x = width * f.x;
-        const bend =
-          width * f.lean +
-          Math.sin(t * f.speed + f.phase) * width * f.sway +
-          Math.sin(t * 2.6 + i * 1.7) * 2.2;
-        const baseY = height * 1.05;
-
-        const grad = ctx.createLinearGradient(x,baseY,x+bend,baseY-h);
-        grad.addColorStop(0,"rgba(255,144,51,.58)");
-        grad.addColorStop(0.36,"rgba(236,80,30,.48)");
-        grad.addColorStop(0.72,"rgba(175,48,25,.26)");
-        grad.addColorStop(1,"rgba(103,31,22,0)");
-
-        flamePath(x,baseY,w,h,bend,0.06);
-        ctx.fillStyle = grad;
-        ctx.fill();
-      });
-
-      ctx.restore();
-
-      // Sharper inner flame cores so the fire has shape rather than only glow.
-      ctx.save();
-      ctx.globalCompositeOperation = "lighter";
-      ctx.filter = "blur(0.8px)";
-
-      flames.forEach((f,i) => {
-        const pulse = 0.91 + Math.sin(t * f.speed * 2.25 + f.phase + 0.7) * 0.09;
-        const h = height * f.height * 0.64 * pulse;
-        const w = Math.max(7, width * f.width * 0.42);
-        const x = width * f.x;
-        const bend =
-          width * f.lean * 0.55 +
-          Math.sin(t * f.speed + f.phase) * width * f.sway * 0.55;
-        const baseY = height * 1.03;
-
-        const grad = ctx.createLinearGradient(x,baseY,x+bend,baseY-h);
-        grad.addColorStop(0,"rgba(255,239,171,.92)");
-        grad.addColorStop(0.32,"rgba(255,188,71,.86)");
-        grad.addColorStop(0.68,"rgba(255,108,35,.54)");
-        grad.addColorStop(1,"rgba(235,72,27,0)");
-
-        flamePath(x,baseY,w,h,bend,0.025);
-        ctx.fillStyle = grad;
-        ctx.fill();
-      });
-
-      ctx.restore();
-
-      // A handful of subtle embers, not a particle cloud.
-      ctx.save();
-      ctx.globalCompositeOperation = "lighter";
-      for (let i=0;i<6;i++) {
-        const s = (t * (0.18 + i * 0.017) + seeded(i + 300)) % 1;
-        const x = width * (0.10 + seeded(i + 340) * 0.80) + Math.sin(t * 1.8 + i) * 5;
-        const y = height * (0.88 - s * 0.72);
-        const a = (1-s) * 0.35;
-        ctx.beginPath();
-        ctx.arc(x,y,0.8 + seeded(i + 380) * 0.9,0,Math.PI*2);
-        ctx.fillStyle = `rgba(255,176,74,${a})`;
-        ctx.fill();
-      }
-      ctx.restore();
-
-      if (!reducedMotion) requestAnimationFrame(draw);
-    }
+    resize();
 
     const ro = window.ResizeObserver ? new ResizeObserver(resize) : null;
     ro?.observe(surface);
-    resize();
 
-    if (reducedMotion) draw(1100);
-    else requestAnimationFrame(draw);
+    const start = performance.now();
+    let last = 0;
+
+    function frame(now) {
+      if (!canvas.isConnected) {
+        ro?.disconnect();
+        gl.deleteBuffer(buffer);
+        gl.deleteProgram(program);
+        return;
+      }
+
+      if (input.checked) {
+        canvas.classList.add("is-extinguished");
+        ro?.disconnect();
+        return;
+      }
+
+      if (document.hidden || now - last < 33) {
+        requestAnimationFrame(frame);
+        return;
+      }
+
+      last = now;
+      resize();
+
+      gl.useProgram(program);
+      gl.uniform1f(timeLoc, (now - start) * 0.001);
+      gl.uniform2f(resolutionLoc, canvas.width, canvas.height);
+
+      gl.clearColor(0,0,0,0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+      requestAnimationFrame(frame);
+    }
+
+    requestAnimationFrame(frame);
   }
 
   function questHtml(m, globalIndex) {
