@@ -1159,3 +1159,397 @@ footer{
   .details-icon{width:28px;height:28px}
   .details-content{padding:12px}
 }
+
+
+/* ---------- compact current-step layout ---------- */
+
+.hero{
+  padding:34px 20px 28px;
+}
+.hero h1{
+  font-size:clamp(36px,5.5vw,60px);
+  margin:8px 0 10px;
+}
+.lede{
+  font-size:15px;
+  max-width:58ch;
+}
+.badges{margin-top:14px}
+.rune-mark{font-size:104px}
+
+.compact-dashboard{
+  display:block;
+  padding:14px 16px;
+  margin-bottom:16px;
+}
+.compact-dashboard .progress-copy{width:100%}
+.progress-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:16px;
+  margin-bottom:8px;
+}
+.progress-row>div{
+  display:flex;
+  align-items:baseline;
+  gap:7px;
+}
+.progress-row span{
+  color:var(--gold);
+  font-size:24px;
+  line-height:1;
+  font-weight:820;
+  letter-spacing:-.03em;
+}
+.progress-row small{
+  color:var(--muted);
+  font-size:10px;
+  line-height:1;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+.progress-row>strong{
+  color:var(--text-soft);
+  font-size:12px;
+  line-height:1;
+  font-weight:700;
+}
+.compact-dashboard .progress-meta{
+  margin-top:7px;
+  font-size:10px;
+}
+
+.roadmap{
+  margin:16px 0 14px;
+}
+
+.compact-quest{
+  border-radius:18px;
+}
+
+.compact-quest-head{
+  padding:20px 22px 18px;
+  border-bottom:1px solid var(--line);
+  background:
+    linear-gradient(115deg,var(--biomeTint),transparent 68%),
+    #101819;
+}
+
+.compact-meta{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:7px;
+  color:var(--muted);
+  font-size:9px;
+  line-height:1.2;
+  font-weight:800;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+}
+
+.compact-meta span{
+  display:inline-flex;
+  align-items:center;
+}
+
+.compact-meta span+span:before{
+  content:"•";
+  margin-right:7px;
+  color:#536360;
+}
+
+.compact-meta .compact-biome{
+  color:var(--biomeColor);
+}
+
+.compact-quest-head h2{
+  max-width:24ch;
+  margin:7px 0 11px;
+  color:var(--text);
+  font-size:clamp(26px,4vw,38px);
+  line-height:1.06;
+  letter-spacing:-.035em;
+  font-weight:820;
+}
+
+.essential-action{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  gap:10px;
+  align-items:baseline;
+  max-width:68ch;
+}
+
+.essential-action>span{
+  color:var(--gold);
+  font-size:9px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:.12em;
+}
+
+.essential-action>strong{
+  color:#f4ead0;
+  font-size:15px;
+  line-height:1.45;
+  font-weight:720;
+}
+
+.compact-quest-body{
+  padding:16px 22px 20px;
+}
+
+.essential-needs .section-label{
+  margin-bottom:8px;
+  color:var(--muted);
+  font-size:9px;
+}
+
+.compact-quest .need-chips{
+  gap:6px;
+}
+.compact-quest .need-chips span{
+  padding:7px 9px;
+  border-radius:8px;
+  font-size:11px;
+  line-height:1.35;
+}
+.compact-quest .need-chips span i{
+  width:5px;
+  height:5px;
+  margin-top:.45em;
+}
+
+.compact-actions{
+  margin-top:16px;
+  padding-top:14px;
+}
+.compact-actions .complete-action>span{
+  min-height:54px;
+  grid-template-columns:32px minmax(0,1fr);
+  column-gap:10px;
+  padding:9px 12px;
+}
+.compact-actions .complete-action>span>b{
+  width:30px;
+  height:30px;
+  border-radius:8px;
+  font-size:16px;
+}
+.compact-actions .complete-action>span>strong{
+  font-size:13px;
+}
+.compact-actions .complete-action>span>small{
+  font-size:9px;
+}
+.compact-actions .skip-action{
+  min-width:145px;
+  padding:9px 11px;
+  font-size:11px;
+}
+.compact-actions .skip-action small{
+  font-size:9px;
+}
+
+/* one disclosure for everything non-essential */
+
+.quest-more{
+  overflow:hidden;
+  margin-top:10px;
+  border:1px solid var(--line);
+  border-radius:11px;
+  background:#0c1415;
+}
+
+.quest-more summary{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  column-gap:12px;
+  row-gap:1px;
+  align-items:center;
+  padding:11px 12px;
+  list-style:none;
+  cursor:pointer;
+  user-select:none;
+}
+
+.quest-more summary::-webkit-details-marker{display:none}
+
+.quest-more summary>span{
+  color:#dbe4df;
+  font-size:12px;
+  line-height:1.3;
+  font-weight:740;
+}
+
+.quest-more summary>small{
+  grid-column:1;
+  color:var(--muted);
+  font-size:9px;
+  line-height:1.35;
+}
+
+.quest-more summary>b{
+  grid-column:2;
+  grid-row:1/3;
+  color:var(--muted);
+  font-size:15px;
+  line-height:1;
+  transition:transform .18s ease,color .18s ease;
+}
+
+.quest-more[open] summary{
+  border-bottom:1px solid var(--line);
+  background:#0f191a;
+}
+
+.quest-more[open] summary>b{
+  transform:rotate(180deg);
+  color:var(--ice);
+}
+
+.quest-more-content{
+  padding:14px;
+}
+
+.detail-intro{
+  max-width:68ch;
+}
+.detail-intro>p{
+  margin:0;
+  color:var(--text-soft);
+  font-size:12px;
+  line-height:1.6;
+}
+.detail-intro .unlock-line{
+  margin-top:10px;
+  padding-top:9px;
+}
+
+.detail-block{
+  margin-top:18px;
+}
+.detail-block>.section-label{
+  margin-bottom:8px;
+  font-size:9px;
+  color:var(--muted);
+}
+
+/* collapsed route so it doesn't compete with current step */
+
+.route-drawer{
+  overflow:hidden;
+  margin:14px 0 18px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#0d1516;
+}
+
+.route-drawer>summary{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:14px;
+  padding:11px 13px;
+  list-style:none;
+  cursor:pointer;
+}
+
+.route-drawer>summary::-webkit-details-marker{display:none}
+.route-drawer>summary strong{
+  display:block;
+  color:#dce5e0;
+  font-size:12px;
+  line-height:1.3;
+}
+.route-drawer>summary small{
+  display:block;
+  margin-top:2px;
+  color:var(--muted);
+  font-size:9px;
+  line-height:1.35;
+}
+.route-drawer>summary>b{
+  color:var(--muted);
+  transition:transform .18s ease;
+}
+.route-drawer[open]>summary{
+  border-bottom:1px solid var(--line);
+}
+.route-drawer[open]>summary>b{
+  transform:rotate(180deg);
+}
+.route-drawer-body{
+  padding:12px 13px 4px;
+}
+
+/* secondary areas sit further down visually */
+.journey-tools{margin-top:14px}
+.reference-section{margin-top:48px}
+
+@media(max-width:560px){
+  .hero{
+    padding:24px 13px 20px;
+  }
+  .hero h1{
+    font-size:34px;
+    margin:5px 0 7px;
+  }
+  .lede{
+    font-size:12px;
+    line-height:1.5;
+  }
+  .badges{
+    margin-top:10px;
+  }
+  .badges span{
+    padding:4px 7px;
+    font-size:8px;
+  }
+
+  .compact-dashboard{
+    padding:11px 12px;
+    margin-bottom:10px;
+  }
+  .progress-row span{font-size:20px}
+
+  .roadmap{margin-top:10px}
+
+  .compact-quest-head{
+    padding:16px 14px 14px;
+  }
+  .compact-quest-head h2{
+    font-size:27px;
+    margin:6px 0 9px;
+  }
+  .essential-action{
+    grid-template-columns:1fr;
+    gap:3px;
+  }
+  .essential-action>strong{
+    font-size:13px;
+  }
+  .compact-quest-body{
+    padding:12px 13px 15px;
+  }
+
+  .compact-quest .need-chips{
+    display:flex;
+  }
+  .compact-quest .need-chips span{
+    width:auto;
+  }
+
+  .compact-actions{
+    grid-template-columns:1fr;
+  }
+  .quest-more summary{
+    padding:10px 11px;
+  }
+
+  .route-drawer{
+    margin-top:10px;
+  }
+}
