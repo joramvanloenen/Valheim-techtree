@@ -246,28 +246,37 @@
           </div>
         </section>
 
-        <section class="quest-section">
-          <div class="section-heading">
-            <div class="section-label">HOW TO GET IT</div>
-            <p>Where the important requirements come from.</p>
-          </div>
-          ${guides.length ? `
-            <div class="acquisition-grid">
-              ${guides.map(([name,tip]) => `<div class="acquisition"><div class="acquisition-name">${name}</div><p>${tip}</p></div>`).join("")}
-            </div>`
-          : `<div class="acquisition fallback"><div class="acquisition-name">Follow the previous unlock</div><p>${m.summary} Your immediate action is: ${m.do}. If a named item was just unlocked by the previous objective, craft or collect it before moving on.</p></div>`}
-        </section>
+        <div class="quest-details-group">
+          <details class="quest-details">
+            <summary>
+              <span class="details-icon">?</span>
+              <span class="details-copy"><strong>Where do I get these items?</strong><small>Locations, drops and crafting routes</small></span>
+              <span class="details-chevron">⌄</span>
+            </summary>
+            <div class="details-content">
+              ${guides.length ? `
+                <div class="acquisition-grid">
+                  ${guides.map(([name,tip]) => `<div class="acquisition"><div class="acquisition-name">${name}</div><p>${tip}</p></div>`).join("")}
+                </div>`
+              : `<div class="acquisition fallback"><div class="acquisition-name">Follow the previous unlock</div><p>${m.summary} Your immediate action is: ${m.do}. If a named item was just unlocked by the previous objective, craft or collect it before moving on.</p></div>`}
+            </div>
+          </details>
 
-        <section class="quest-section route-box">
-          <div class="section-heading compact">
-            <div class="section-label">DO THIS NOW</div>
-          </div>
-          <ol class="action-steps">
-            <li><span>1</span><div><strong>Prepare</strong><p>Gather the requirements above before committing to the trip or fight.</p></div></li>
-            <li><span>2</span><div><strong>Execute</strong><p>${m.do}.</p></div></li>
-            <li><span>3</span><div><strong>Confirm</strong><p>Mark the step complete only when the objective is actually finished in your world.</p></div></li>
-          </ol>
-        </section>
+          <details class="quest-details">
+            <summary>
+              <span class="details-icon">≡</span>
+              <span class="details-copy"><strong>Extra guidance</strong><small>A simple prepare → execute → confirm checklist</small></span>
+              <span class="details-chevron">⌄</span>
+            </summary>
+            <div class="details-content">
+              <ol class="action-steps">
+                <li><span>1</span><div><strong>Prepare</strong><p>Gather the requirements above before committing to the trip or fight.</p></div></li>
+                <li><span>2</span><div><strong>Execute</strong><p>${m.do}.</p></div></li>
+                <li><span>3</span><div><strong>Confirm</strong><p>Mark the step complete only when the objective is actually finished in your world.</p></div></li>
+              </ol>
+            </div>
+          </details>
+        </div>
 
         <div class="quest-actions">
           <label class="complete-action">
