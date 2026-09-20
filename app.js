@@ -327,32 +327,25 @@
     }
 
     const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    let width = 0;
-    let height = 0;
+    let width = 1;
+    let height = 1;
     let dpr = 1;
 
-    // Deterministic pseudo-random numbers keep the flame layout stable across rerenders.
     function seeded(seed) {
       const x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
       return x - Math.floor(x);
     }
 
-    const flames = Array.from({length:24}, (_, i) => ({
-      x: 0.025 + seeded(i + 1) * 0.95,
-      phase: seeded(i + 31),
-      speed: 0.34 + seeded(i + 61) * 0.34,
-      width: 0.012 + seeded(i + 91) * 0.015,
-      height: 0.28 + seeded(i + 121) * 0.40,
-      sway: 0.010 + seeded(i + 151) * 0.018,
-      hot: seeded(i + 181)
-    }));
-
-    const sparks = Array.from({length:14}, (_, i) => ({
-      x: seeded(i + 211),
-      phase: seeded(i + 241),
-      speed: 0.22 + seeded(i + 271) * 0.30,
-      drift: (seeded(i + 301) - 0.5) * 0.08,
-      size: 0.8 + seeded(i + 331) * 1.5
+    // Fewer, larger flame tongues. They stay alive continuously rather than
+    // spawning as tiny particles, which keeps the effect readable on mobile.
+    const flames = Array.from({length:11}, (_, i) => ({
+      x: 0.05 + (i / 10) * 0.90 + (seeded(i + 2) - 0.5) * 0.035,
+      phase: seeded(i + 41) * Math.PI * 2,
+      speed: 0.82 + seeded(i + 71) * 0.55,
+      width: 0.045 + seeded(i + 101) * 0.028,
+      height: 0.42 + seeded(i + 131) * 0.30,
+      sway: 0.018 + seeded(i + 161) * 0.020,
+      lean: (seeded(i + 191) - 0.5) * 0.06
     }));
 
     function resize() {
@@ -360,62 +353,42 @@
       width = Math.max(1, rect.width);
       height = Math.max(1, rect.height);
       dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      const pxW = Math.max(2, Math.round(width * dpr));
-      const pxH = Math.max(2, Math.round(height * dpr));
-      if (canvas.width !== pxW || canvas.height !== pxH) {
-        canvas.width = pxW;
-        canvas.height = pxH;
+      const w = Math.max(2, Math.round(width * dpr));
+      const h = Math.max(2, Math.round(height * dpr));
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
         canvas.style.width = width + "px";
         canvas.style.height = height + "px";
       }
     }
 
-    function drawFlame(x, baseY, w, h, bend, alpha, hot) {
+    function flamePath(x, baseY, w, h, bend, pinch) {
       const tipX = x + bend;
-      const shoulderY = baseY - h * 0.28;
       const tipY = baseY - h;
-
-      const grad = ctx.createLinearGradient(x, baseY, tipX, tipY);
-      grad.addColorStop(0.00, `rgba(255,226,128,${alpha})`);
-      grad.addColorStop(0.20, `rgba(255,177,65,${alpha * 0.98})`);
-      grad.addColorStop(0.54, `rgba(232,91,35,${alpha * 0.82})`);
-      grad.addColorStop(0.82, `rgba(152,47,25,${alpha * 0.46})`);
-      grad.addColorStop(1.00, "rgba(95,30,22,0)");
 
       ctx.beginPath();
       ctx.moveTo(x - w * 0.52, baseY);
       ctx.bezierCurveTo(
-        x - w * 0.62, shoulderY,
-        tipX - w * (0.22 + hot * 0.10), tipY + h * 0.23,
-        tipX, tipY
+        x - w * 0.74,
+        baseY - h * 0.28,
+        tipX - w * (0.20 + pinch),
+        tipY + h * 0.30,
+        tipX,
+        tipY
       );
       ctx.bezierCurveTo(
-        tipX + w * (0.18 + hot * 0.08), tipY + h * 0.25,
-        x + w * 0.58, shoulderY,
-        x + w * 0.52, baseY
+        tipX + w * (0.16 + pinch * 0.7),
+        tipY + h * 0.27,
+        x + w * 0.70,
+        baseY - h * 0.25,
+        x + w * 0.52,
+        baseY
       );
       ctx.closePath();
-      ctx.fillStyle = grad;
-      ctx.fill();
-
-      // Smaller hot core gives each tongue a readable flame shape.
-      const coreH = h * (0.42 + hot * 0.16);
-      const coreW = w * 0.42;
-      const coreGrad = ctx.createLinearGradient(x, baseY, x, baseY - coreH);
-      coreGrad.addColorStop(0, `rgba(255,244,188,${alpha * 0.88})`);
-      coreGrad.addColorStop(0.42, `rgba(255,196,86,${alpha * 0.70})`);
-      coreGrad.addColorStop(1, "rgba(255,128,42,0)");
-
-      ctx.beginPath();
-      ctx.moveTo(x - coreW, baseY);
-      ctx.quadraticCurveTo(x - coreW * 0.45, baseY - coreH * 0.55, x + bend * 0.35, baseY - coreH);
-      ctx.quadraticCurveTo(x + coreW * 0.45, baseY - coreH * 0.50, x + coreW, baseY);
-      ctx.closePath();
-      ctx.fillStyle = coreGrad;
-      ctx.fill();
     }
 
-    function render(now) {
+    function draw(now) {
       if (!canvas.isConnected) return;
       if (input.checked) {
         canvas.classList.add("is-extinguished");
@@ -428,63 +401,95 @@
 
       const t = now * 0.001;
 
-      // Warm forge bed at the bottom, visible but not a flat bright line.
-      const bed = ctx.createLinearGradient(0,height,0,height * 0.52);
-      bed.addColorStop(0,"rgba(255,104,30,.56)");
-      bed.addColorStop(0.28,"rgba(211,65,28,.23)");
-      bed.addColorStop(1,"rgba(122,40,25,0)");
-      ctx.fillStyle = bed;
-      ctx.fillRect(0,height * 0.48,width,height * 0.52);
+      // Soft furnace glow at the base, deliberately broad but dim.
+      const glow = ctx.createLinearGradient(0,height,0,height * 0.44);
+      glow.addColorStop(0,"rgba(255,111,35,.45)");
+      glow.addColorStop(0.22,"rgba(210,67,28,.19)");
+      glow.addColorStop(1,"rgba(111,34,23,0)");
+      ctx.fillStyle = glow;
+      ctx.fillRect(0,height * 0.42,width,height * 0.58);
 
+      ctx.save();
       ctx.globalCompositeOperation = "lighter";
+      ctx.filter = "blur(3.2px)";
 
-      for (let i=0;i<flames.length;i++) {
-        const f = flames[i];
-        const life = (f.phase + t * f.speed) % 1;
-        const rise = life;
-        const fade = Math.sin(Math.min(1, life) * Math.PI);
-        const baseY = height + height * 0.055 - rise * height * 0.16;
-        const flameH = height * f.height * (0.72 + 0.28 * Math.sin(t * 2.2 + i * 1.91));
-        const flameW = Math.max(5, Math.min(14, width * f.width));
+      // Outer, smoky-orange flame bodies.
+      flames.forEach((f,i) => {
+        const pulse = 0.88 + Math.sin(t * f.speed * 2.0 + f.phase) * 0.12;
+        const h = height * f.height * pulse;
+        const w = Math.max(14, width * f.width);
         const x = width * f.x;
         const bend =
-          Math.sin(t * (1.5 + f.speed) + i * 2.17) * width * f.sway +
-          Math.sin(t * 3.1 + i) * 2.2;
-        const alpha = (0.30 + 0.48 * fade) * (0.80 + f.hot * 0.20);
-        drawFlame(x, baseY, flameW, flameH, bend, alpha, f.hot);
-      }
+          width * f.lean +
+          Math.sin(t * f.speed + f.phase) * width * f.sway +
+          Math.sin(t * 2.6 + i * 1.7) * 2.2;
+        const baseY = height * 1.05;
 
-      // Small sparks rise above the tongues.
-      for (let i=0;i<sparks.length;i++) {
-        const s = sparks[i];
-        const life = (s.phase + t * s.speed) % 1;
-        if (life < 0.22) continue;
-        const y = height * (0.95 - life * 1.05);
-        if (y < -4) continue;
-        const x = width * (s.x + s.drift * life) + Math.sin(t * 2.3 + i) * 3;
-        const a = (1 - life) * 0.62;
+        const grad = ctx.createLinearGradient(x,baseY,x+bend,baseY-h);
+        grad.addColorStop(0,"rgba(255,144,51,.58)");
+        grad.addColorStop(0.36,"rgba(236,80,30,.48)");
+        grad.addColorStop(0.72,"rgba(175,48,25,.26)");
+        grad.addColorStop(1,"rgba(103,31,22,0)");
+
+        flamePath(x,baseY,w,h,bend,0.06);
+        ctx.fillStyle = grad;
+        ctx.fill();
+      });
+
+      ctx.restore();
+
+      // Sharper inner flame cores so the fire has shape rather than only glow.
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
+      ctx.filter = "blur(0.8px)";
+
+      flames.forEach((f,i) => {
+        const pulse = 0.91 + Math.sin(t * f.speed * 2.25 + f.phase + 0.7) * 0.09;
+        const h = height * f.height * 0.64 * pulse;
+        const w = Math.max(7, width * f.width * 0.42);
+        const x = width * f.x;
+        const bend =
+          width * f.lean * 0.55 +
+          Math.sin(t * f.speed + f.phase) * width * f.sway * 0.55;
+        const baseY = height * 1.03;
+
+        const grad = ctx.createLinearGradient(x,baseY,x+bend,baseY-h);
+        grad.addColorStop(0,"rgba(255,239,171,.92)");
+        grad.addColorStop(0.32,"rgba(255,188,71,.86)");
+        grad.addColorStop(0.68,"rgba(255,108,35,.54)");
+        grad.addColorStop(1,"rgba(235,72,27,0)");
+
+        flamePath(x,baseY,w,h,bend,0.025);
+        ctx.fillStyle = grad;
+        ctx.fill();
+      });
+
+      ctx.restore();
+
+      // A handful of subtle embers, not a particle cloud.
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
+      for (let i=0;i<6;i++) {
+        const s = (t * (0.18 + i * 0.017) + seeded(i + 300)) % 1;
+        const x = width * (0.10 + seeded(i + 340) * 0.80) + Math.sin(t * 1.8 + i) * 5;
+        const y = height * (0.88 - s * 0.72);
+        const a = (1-s) * 0.35;
         ctx.beginPath();
-        ctx.arc(x,y,s.size,0,Math.PI*2);
-        ctx.fillStyle = `rgba(255,187,76,${a})`;
+        ctx.arc(x,y,0.8 + seeded(i + 380) * 0.9,0,Math.PI*2);
+        ctx.fillStyle = `rgba(255,176,74,${a})`;
         ctx.fill();
       }
+      ctx.restore();
 
-      ctx.globalCompositeOperation = "source-over";
-
-      if (!reducedMotion) {
-        requestAnimationFrame(render);
-      }
+      if (!reducedMotion) requestAnimationFrame(draw);
     }
 
     const ro = window.ResizeObserver ? new ResizeObserver(resize) : null;
     ro?.observe(surface);
     resize();
 
-    if (reducedMotion) {
-      render(1250);
-    } else {
-      requestAnimationFrame(render);
-    }
+    if (reducedMotion) draw(1100);
+    else requestAnimationFrame(draw);
   }
 
   function questHtml(m, globalIndex) {
