@@ -3185,3 +3185,61 @@ body{
     font-size:11px;
   }
 }
+
+
+/* ---------- step context outside objective card ---------- */
+
+.quest-context{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:7px;
+  margin:0 4px 7px;
+  color:#a4b1ad;
+  font-size:11px;
+  line-height:1.25;
+  font-weight:820;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
+.quest-context span+span::before{
+  content:"•";
+  margin-right:7px;
+  color:#5f716d;
+}
+
+.quest-context .quest-context-biome{
+  color:var(--biomeColor);
+}
+
+.compact-quest-head h2{
+  margin-top:0;
+}
+
+.visible-details .standalone-unlock{
+  margin-top:0;
+  padding-top:0;
+  border-top:0;
+}
+
+.visible-details .standalone-unlock span{
+  color:#aa9bcf;
+}
+
+.visible-details .standalone-unlock strong{
+  color:#c9afff;
+}
+
+@media(max-width:560px){
+  .quest-context{
+    margin:0 3px 6px;
+    gap:5px;
+    font-size:10px;
+    letter-spacing:.07em;
+  }
+
+  .quest-context span+span::before{
+    margin-right:5px;
+  }
+}
