@@ -215,76 +215,67 @@
     const items = prepareItems(m.need);
     const side = m.type !== "core";
 
-    return `<article class="quest-card" id="currentQuest" style="--biomeColor:${m.stage.color};--biomeTint:${m.stage.tint}">
-      <header class="quest-header">
-        <div>
-          <div class="quest-kicker">STEP ${globalIndex + 1} • ${typeLabel(m.type)}</div>
-          <div class="biome-reveal">${m.stageName}</div>
-          <h2>${m.title}</h2>
-          <p>${m.summary}</p>
+    return `<article class="quest-card compact-quest" id="currentQuest" style="--biomeColor:${m.stage.color};--biomeTint:${m.stage.tint}">
+      <header class="compact-quest-head">
+        <div class="compact-meta">
+          <span>STEP ${globalIndex + 1}</span>
+          <span class="compact-biome">${m.stageName}</span>
+          <span>${typeLabel(m.type)}</span>
         </div>
-        <div class="quest-rune">${m.stage.index}</div>
+        <h2>${m.title}</h2>
+        <div class="essential-action">
+          <span>DO</span>
+          <strong>${m.do}</strong>
+        </div>
       </header>
 
-      <div class="quest-body">
-        <section class="goal-card">
-          <div class="goal-icon">◎</div>
-          <div class="goal-content">
-            <div class="goal-label">YOUR OBJECTIVE</div>
-            <h3>${m.do}</h3>
-            <div class="unlock-line"><span>UNLOCKS</span><strong>${m.unlock}</strong></div>
-          </div>
-        </section>
-
-        <section class="quest-section">
-          <div class="section-heading">
-            <div class="section-label">WHAT YOU NEED</div>
-            <p>Gather these before you commit to the objective.</p>
-          </div>
+      <div class="compact-quest-body">
+        <section class="essential-needs">
+          <div class="section-label">NEEDED</div>
           <div class="need-chips">
             ${items.map(item => `<span><i></i>${escapeHtml(item)}</span>`).join("")}
           </div>
         </section>
 
-        <div class="quest-details-group">
-          <details class="quest-details">
-            <summary>
-              <span class="details-icon">?</span>
-              <span class="details-copy"><strong>Where do I get these items?</strong><small>Locations, drops and crafting routes</small></span>
-              <span class="details-chevron">⌄</span>
-            </summary>
-            <div class="details-content">
+        <div class="quest-actions compact-actions">
+          <label class="complete-action">
+            <input class="check current-check" type="checkbox" data-id="${m.id}">
+            <span><b>✓</b><strong>Done</strong><small>Reveal next step</small></span>
+          </label>
+          ${side ? `<button class="skip-action" data-skip="${m.id}">Skip <span>→</span><small>Optional for progression</small></button>` : ""}
+        </div>
+
+        <details class="quest-more">
+          <summary>
+            <span>More details</span>
+            <small>Why this matters, where to get items, and extra guidance</small>
+            <b>⌄</b>
+          </summary>
+          <div class="quest-more-content">
+            <div class="detail-intro">
+              <p>${m.summary}</p>
+              <div class="unlock-line"><span>UNLOCKS</span><strong>${m.unlock}</strong></div>
+            </div>
+
+            <div class="detail-block">
+              <div class="section-label">WHERE TO GET IT</div>
               ${guides.length ? `
                 <div class="acquisition-grid">
                   ${guides.map(([name,tip]) => `<div class="acquisition"><div class="acquisition-name">${name}</div><p>${tip}</p></div>`).join("")}
                 </div>`
-              : `<div class="acquisition fallback"><div class="acquisition-name">Follow the previous unlock</div><p>${m.summary} Your immediate action is: ${m.do}. If a named item was just unlocked by the previous objective, craft or collect it before moving on.</p></div>`}
+              : `<div class="acquisition fallback"><div class="acquisition-name">Follow the previous unlock</div><p>${m.summary} Your immediate action is: ${m.do}.</p></div>`}
             </div>
-          </details>
 
-          <details class="quest-details">
-            <summary>
-              <span class="details-icon">≡</span>
-              <span class="details-copy"><strong>Extra guidance</strong><small>A simple prepare → execute → confirm checklist</small></span>
-              <span class="details-chevron">⌄</span>
-            </summary>
-            <div class="details-content">
+            <div class="detail-block">
+              <div class="section-label">QUICK CHECKLIST</div>
               <ol class="action-steps">
-                <li><span>1</span><div><strong>Prepare</strong><p>Gather the requirements above before committing to the trip or fight.</p></div></li>
+                <li><span>1</span><div><strong>Prepare</strong><p>Gather the requirements listed above.</p></div></li>
                 <li><span>2</span><div><strong>Execute</strong><p>${m.do}.</p></div></li>
-                <li><span>3</span><div><strong>Confirm</strong><p>Mark the step complete only when the objective is actually finished in your world.</p></div></li>
+                <li><span>3</span><div><strong>Confirm</strong><p>Mark it done when the objective is finished in your world.</p></div></li>
               </ol>
             </div>
-          </details>
-        </div>
-
-        <div class="quest-actions">
-          <label class="complete-action">
-            <input class="check current-check" type="checkbox" data-id="${m.id}">
-            <span><b>✓</b><strong>Mark objective complete</strong><small>Reveal the next step</small></span>
-          </label>
-          ${side ? `<button class="skip-action" data-skip="${m.id}">Skip this side step <span>→</span><small>It won't block the main route</small></button>` : ""}
-        </div>
+          </div>
+        </details>
       </div>
     </article>`;
   }
@@ -337,13 +328,13 @@
     $("#stepNumber").textContent = current ? `Step ${currentIndex()+1}` : "Saga complete";
 
     if (current) {
-      $("#nextMilestoneTitle").textContent = current.title;
-      $("#nextMilestoneMeta").textContent = `${current.stageName} • ${typeLabel(current.type)}`;
-      $("#jumpNext").disabled = false;
+      if ($("#nextMilestoneTitle")) $("#nextMilestoneTitle").textContent = current.title;
+      if ($("#nextMilestoneMeta")) $("#nextMilestoneMeta").textContent = `${current.stageName} • ${typeLabel(current.type)}`;
+      if ($("#jumpNext")) $("#jumpNext").disabled = false;
     } else {
-      $("#nextMilestoneTitle").textContent = "The guided path is complete";
-      $("#nextMilestoneMeta").textContent = "Skål.";
-      $("#jumpNext").disabled = true;
+      if ($("#nextMilestoneTitle")) $("#nextMilestoneTitle").textContent = "The guided path is complete";
+      if ($("#nextMilestoneMeta")) $("#nextMilestoneMeta").textContent = "Skål.";
+      if ($("#jumpNext")) $("#jumpNext").disabled = true;
     }
   }
 
@@ -425,7 +416,7 @@
     renderHistory();
   }
 
-  $("#jumpNext").addEventListener("click", () => {
+  $("#jumpNext")?.addEventListener("click", () => {
     $("#currentQuest")?.scrollIntoView({behavior:"smooth", block:"center"});
   });
 
