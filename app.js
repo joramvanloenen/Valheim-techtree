@@ -240,7 +240,7 @@
         <div class="quest-actions compact-actions">
           <label class="complete-action">
             <input class="check current-check" type="checkbox" data-id="${m.id}">
-            <span><b>✓</b><strong>Done</strong><small>Reveal next step</small></span>
+            <span><b aria-hidden="true"></b><strong>Mark done</strong><small>Reveal next step</small></span>
           </label>
           ${side ? `<button class="skip-action" data-skip="${m.id}">Skip <span>→</span><small>Optional for progression</small></button>` : ""}
         </div>
@@ -302,7 +302,7 @@
         saveProgress();
         setTimeout(() => {
           renderAll(true);
-        }, 180);
+        }, 320);
       });
       $(".skip-action")?.addEventListener("click", e => {
         const button = e.target.closest("[data-skip]");
