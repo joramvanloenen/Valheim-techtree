@@ -314,237 +314,177 @@
     const input = document.querySelector(".current-check");
     if (!surface || !input || input.checked) return;
 
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
-      surface.classList.add("fire-static");
-      return;
-    }
-
     const canvas = document.createElement("canvas");
     canvas.className = "markdone-fire";
     canvas.setAttribute("aria-hidden", "true");
     surface.prepend(canvas);
 
-    const gl = canvas.getContext("webgl", {
-      alpha:true,
-      antialias:false,
-      depth:false,
-      stencil:false,
-      premultipliedAlpha:true,
-      powerPreference:"low-power"
-    });
-
-    if (!gl) {
+    const ctx = canvas.getContext("2d", {alpha:true});
+    if (!ctx) {
       canvas.remove();
       surface.classList.add("fire-static");
       return;
     }
 
-    const vertexSource = `
-      attribute vec2 a_position;
-      varying vec2 v_uv;
-      void main() {
-        v_uv = a_position * 0.5 + 0.5;
-        gl_Position = vec4(a_position, 0.0, 1.0);
-      }
-    `;
+    const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
 
-    const fragmentSource = `
-      precision mediump float;
-      varying vec2 v_uv;
-      uniform float u_time;
-      uniform vec2 u_resolution;
-
-      float hash(vec2 p) {
-        p = fract(p * vec2(123.34, 456.21));
-        p += dot(p, p + 45.32);
-        return fract(p.x * p.y);
-      }
-
-      float noise(vec2 p) {
-        vec2 i = floor(p);
-        vec2 f = fract(p);
-        f = f * f * (3.0 - 2.0 * f);
-        float a = hash(i);
-        float b = hash(i + vec2(1.0, 0.0));
-        float c = hash(i + vec2(0.0, 1.0));
-        float d = hash(i + vec2(1.0, 1.0));
-        return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
-      }
-
-      float fbm(vec2 p) {
-        float value = 0.0;
-        float amp = 0.5;
-        for (int i = 0; i < 5; i++) {
-          value += amp * noise(p);
-          p = p * 2.03 + vec2(17.1, 9.2);
-          amp *= 0.5;
-        }
-        return value;
-      }
-
-      void main() {
-        vec2 uv = v_uv;
-        float t = u_time;
-
-        // Organic forge turbulence: no fixed columns or repeating zig-zag shapes.
-        float warpA = fbm(vec2(uv.x * 3.2, uv.y * 2.2 - t * 0.38));
-        float warpB = fbm(vec2(uv.x * 6.7 + 9.3, uv.y * 3.8 - t * 0.72));
-
-        vec2 flowUv = vec2(
-          uv.x * 7.8 + (warpA - 0.5) * 1.35,
-          uv.y * 5.6 - t * 0.95
-        );
-
-        float coarse = fbm(flowUv);
-        float fine = fbm(vec2(
-          uv.x * 15.5 + (warpB - 0.5) * 1.15,
-          uv.y * 10.0 - t * 1.45
-        ));
-
-        // Visible but irregular flame body. Broad noise establishes the
-        // silhouette; higher-frequency noise cuts it into smaller moving licks.
-        float pockets = smoothstep(0.28, 0.60, coarse * 0.68 + fine * 0.32);
-
-        float baseHeight =
-          (1.0 - uv.y) * 1.18 +
-          coarse * 0.52 +
-          fine * 0.18;
-
-        float breakup = smoothstep(0.26, 0.62, fine + coarse * 0.20);
-        float licks = smoothstep(0.82, 1.14, baseHeight) * mix(0.42, 1.0, pockets * breakup);
-        licks *= 1.0 - smoothstep(0.58, 0.91, uv.y);
-
-        // Always-visible forge bed across the lower quarter.
-        float emberNoise = 0.78 + 0.22 * noise(vec2(uv.x * 20.0 - t * 0.34, t * 1.9));
-        float fireBed = (1.0 - smoothstep(0.05, 0.30, uv.y)) * emberNoise;
-
-        float flame = max(licks, fireBed * 0.94);
-        flame *= smoothstep(-0.025, 0.045, uv.y);
-
-        float core =
-          max(
-            smoothstep(1.00, 1.30, baseHeight) * pockets * breakup,
-            fireBed * 0.72
-          ) *
-          (1.0 - smoothstep(0.0, 0.48, uv.y));
-
-        float rim =
-          (smoothstep(0.72, 0.91, baseHeight) -
-           smoothstep(1.10, 1.28, baseHeight)) *
-          mix(0.35, 1.0, pockets);
-
-        vec3 ember = vec3(0.47, 0.075, 0.018);
-        vec3 orange = vec3(0.96, 0.25, 0.035);
-        vec3 amber = vec3(1.0, 0.56, 0.10);
-        vec3 hot = vec3(1.0, 0.87, 0.48);
-
-        vec3 color = mix(ember, orange, clamp(flame * 1.35 + rim * 0.45, 0.0, 1.0));
-        color = mix(color, amber, clamp(core * 1.15, 0.0, 1.0));
-        color = mix(color, hot, clamp(core * core * 0.72, 0.0, 1.0));
-
-        float alpha = flame * 0.88 + core * 0.28;
-        alpha *= 0.88 + 0.12 * noise(vec2(uv.x * 14.0, t * 2.0));
-        alpha = clamp(alpha, 0.0, 0.96);
-
-        gl_FragColor = vec4(color * alpha, alpha);
-      }
-    `;
-
-    function compile(type, source) {
-      const shader = gl.createShader(type);
-      gl.shaderSource(shader, source);
-      gl.compileShader(shader);
-      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        gl.deleteShader(shader);
-        return null;
-      }
-      return shader;
+    // Deterministic pseudo-random numbers keep the flame layout stable across rerenders.
+    function seeded(seed) {
+      const x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
+      return x - Math.floor(x);
     }
 
-    const vs = compile(gl.VERTEX_SHADER, vertexSource);
-    const fs = compile(gl.FRAGMENT_SHADER, fragmentSource);
-    if (!vs || !fs) {
-      canvas.remove();
-      surface.classList.add("fire-static");
-      return;
-    }
+    const flames = Array.from({length:24}, (_, i) => ({
+      x: 0.025 + seeded(i + 1) * 0.95,
+      phase: seeded(i + 31),
+      speed: 0.34 + seeded(i + 61) * 0.34,
+      width: 0.012 + seeded(i + 91) * 0.015,
+      height: 0.28 + seeded(i + 121) * 0.40,
+      sway: 0.010 + seeded(i + 151) * 0.018,
+      hot: seeded(i + 181)
+    }));
 
-    const program = gl.createProgram();
-    gl.attachShader(program, vs);
-    gl.attachShader(program, fs);
-    gl.linkProgram(program);
-    gl.deleteShader(vs);
-    gl.deleteShader(fs);
-
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      gl.deleteProgram(program);
-      canvas.remove();
-      surface.classList.add("fire-static");
-      return;
-    }
-
-    gl.useProgram(program);
-    const position = gl.getAttribLocation(program, "a_position");
-    const timeLoc = gl.getUniformLocation(program, "u_time");
-    const resolutionLoc = gl.getUniformLocation(program, "u_resolution");
-
-    const buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-      -1,-1, 1,-1, -1,1,
-      -1,1, 1,-1, 1,1
-    ]), gl.STATIC_DRAW);
-    gl.enableVertexAttribArray(position);
-    gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+    const sparks = Array.from({length:14}, (_, i) => ({
+      x: seeded(i + 211),
+      phase: seeded(i + 241),
+      speed: 0.22 + seeded(i + 271) * 0.30,
+      drift: (seeded(i + 301) - 0.5) * 0.08,
+      size: 0.8 + seeded(i + 331) * 1.5
+    }));
 
     function resize() {
       const rect = surface.getBoundingClientRect();
-      const scale = Math.min(window.devicePixelRatio || 1, 1.25) * 0.72;
-      const w = Math.max(2, Math.min(520, Math.round(rect.width * scale)));
-      const h = Math.max(2, Math.min(120, Math.round(rect.height * scale)));
-      if (canvas.width !== w || canvas.height !== h) {
-        canvas.width = w;
-        canvas.height = h;
-        gl.viewport(0, 0, w, h);
+      width = Math.max(1, rect.width);
+      height = Math.max(1, rect.height);
+      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      const pxW = Math.max(2, Math.round(width * dpr));
+      const pxH = Math.max(2, Math.round(height * dpr));
+      if (canvas.width !== pxW || canvas.height !== pxH) {
+        canvas.width = pxW;
+        canvas.height = pxH;
+        canvas.style.width = width + "px";
+        canvas.style.height = height + "px";
       }
     }
 
-    resize();
-    const ro = window.ResizeObserver ? new ResizeObserver(resize) : null;
-    ro?.observe(surface);
+    function drawFlame(x, baseY, w, h, bend, alpha, hot) {
+      const tipX = x + bend;
+      const shoulderY = baseY - h * 0.28;
+      const tipY = baseY - h;
 
-    const start = performance.now();
-    let last = 0;
+      const grad = ctx.createLinearGradient(x, baseY, tipX, tipY);
+      grad.addColorStop(0.00, `rgba(255,226,128,${alpha})`);
+      grad.addColorStop(0.20, `rgba(255,177,65,${alpha * 0.98})`);
+      grad.addColorStop(0.54, `rgba(232,91,35,${alpha * 0.82})`);
+      grad.addColorStop(0.82, `rgba(152,47,25,${alpha * 0.46})`);
+      grad.addColorStop(1.00, "rgba(95,30,22,0)");
 
-    function frame(now) {
-      if (!canvas.isConnected) {
-        ro?.disconnect();
-        gl.deleteBuffer(buffer);
-        gl.deleteProgram(program);
-        return;
-      }
+      ctx.beginPath();
+      ctx.moveTo(x - w * 0.52, baseY);
+      ctx.bezierCurveTo(
+        x - w * 0.62, shoulderY,
+        tipX - w * (0.22 + hot * 0.10), tipY + h * 0.23,
+        tipX, tipY
+      );
+      ctx.bezierCurveTo(
+        tipX + w * (0.18 + hot * 0.08), tipY + h * 0.25,
+        x + w * 0.58, shoulderY,
+        x + w * 0.52, baseY
+      );
+      ctx.closePath();
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // Smaller hot core gives each tongue a readable flame shape.
+      const coreH = h * (0.42 + hot * 0.16);
+      const coreW = w * 0.42;
+      const coreGrad = ctx.createLinearGradient(x, baseY, x, baseY - coreH);
+      coreGrad.addColorStop(0, `rgba(255,244,188,${alpha * 0.88})`);
+      coreGrad.addColorStop(0.42, `rgba(255,196,86,${alpha * 0.70})`);
+      coreGrad.addColorStop(1, "rgba(255,128,42,0)");
+
+      ctx.beginPath();
+      ctx.moveTo(x - coreW, baseY);
+      ctx.quadraticCurveTo(x - coreW * 0.45, baseY - coreH * 0.55, x + bend * 0.35, baseY - coreH);
+      ctx.quadraticCurveTo(x + coreW * 0.45, baseY - coreH * 0.50, x + coreW, baseY);
+      ctx.closePath();
+      ctx.fillStyle = coreGrad;
+      ctx.fill();
+    }
+
+    function render(now) {
+      if (!canvas.isConnected) return;
       if (input.checked) {
         canvas.classList.add("is-extinguished");
-        ro?.disconnect();
-        return;
-      }
-      if (document.hidden || now - last < 33) {
-        requestAnimationFrame(frame);
         return;
       }
 
-      last = now;
       resize();
-      gl.useProgram(program);
-      gl.uniform1f(timeLoc, (now - start) * 0.001);
-      gl.uniform2f(resolutionLoc, canvas.width, canvas.height);
-      gl.clearColor(0,0,0,0);
-      gl.clear(gl.COLOR_BUFFER_BIT);
-      gl.drawArrays(gl.TRIANGLES, 0, 6);
-      requestAnimationFrame(frame);
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      ctx.clearRect(0,0,width,height);
+
+      const t = now * 0.001;
+
+      // Warm forge bed at the bottom, visible but not a flat bright line.
+      const bed = ctx.createLinearGradient(0,height,0,height * 0.52);
+      bed.addColorStop(0,"rgba(255,104,30,.56)");
+      bed.addColorStop(0.28,"rgba(211,65,28,.23)");
+      bed.addColorStop(1,"rgba(122,40,25,0)");
+      ctx.fillStyle = bed;
+      ctx.fillRect(0,height * 0.48,width,height * 0.52);
+
+      ctx.globalCompositeOperation = "lighter";
+
+      for (let i=0;i<flames.length;i++) {
+        const f = flames[i];
+        const life = (f.phase + t * f.speed) % 1;
+        const rise = life;
+        const fade = Math.sin(Math.min(1, life) * Math.PI);
+        const baseY = height + height * 0.055 - rise * height * 0.16;
+        const flameH = height * f.height * (0.72 + 0.28 * Math.sin(t * 2.2 + i * 1.91));
+        const flameW = Math.max(5, Math.min(14, width * f.width));
+        const x = width * f.x;
+        const bend =
+          Math.sin(t * (1.5 + f.speed) + i * 2.17) * width * f.sway +
+          Math.sin(t * 3.1 + i) * 2.2;
+        const alpha = (0.30 + 0.48 * fade) * (0.80 + f.hot * 0.20);
+        drawFlame(x, baseY, flameW, flameH, bend, alpha, f.hot);
+      }
+
+      // Small sparks rise above the tongues.
+      for (let i=0;i<sparks.length;i++) {
+        const s = sparks[i];
+        const life = (s.phase + t * s.speed) % 1;
+        if (life < 0.22) continue;
+        const y = height * (0.95 - life * 1.05);
+        if (y < -4) continue;
+        const x = width * (s.x + s.drift * life) + Math.sin(t * 2.3 + i) * 3;
+        const a = (1 - life) * 0.62;
+        ctx.beginPath();
+        ctx.arc(x,y,s.size,0,Math.PI*2);
+        ctx.fillStyle = `rgba(255,187,76,${a})`;
+        ctx.fill();
+      }
+
+      ctx.globalCompositeOperation = "source-over";
+
+      if (!reducedMotion) {
+        requestAnimationFrame(render);
+      }
     }
 
-    requestAnimationFrame(frame);
+    const ro = window.ResizeObserver ? new ResizeObserver(resize) : null;
+    ro?.observe(surface);
+    resize();
+
+    if (reducedMotion) {
+      render(1250);
+    } else {
+      requestAnimationFrame(render);
+    }
   }
 
   function questHtml(m, globalIndex) {
