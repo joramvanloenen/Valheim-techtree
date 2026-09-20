@@ -3428,3 +3428,8 @@ body{
     font-size:10px;
   }
 }
+
+
+.hero-inner{
+  position:relative;
+}
