@@ -309,65 +309,10 @@
     return chosen.map(([,value]) => value);
   }
 
-  const FIRE_TUNING_DEFAULTS = {
-    height:0.98,
-    scale:1.0,
-    turbulence:1.0,
-    speed:1.0,
-    brightness:1.0,
-    cutoff:0.69
-  };
-
-  function loadFireTuning() {
-    try {
-      const saved = JSON.parse(sessionStorage.getItem("valheim-fire-tuning-temp") || "{}");
-      return {...FIRE_TUNING_DEFAULTS, ...saved};
-    } catch {
-      return {...FIRE_TUNING_DEFAULTS};
-    }
-  }
-
-  function saveFireTuning(values) {
-    try {
-      sessionStorage.setItem("valheim-fire-tuning-temp", JSON.stringify(values));
-    } catch {}
-  }
-
-  function wireFireTuningControls(values) {
-    const controls = [...document.querySelectorAll("[data-fire-tune]")];
-    controls.forEach(input => {
-      const key = input.dataset.fireTune;
-      if (!(key in values)) return;
-      input.value = values[key];
-      const output = document.querySelector(`[data-fire-value="${key}"]`);
-      if (output) output.textContent = Number(values[key]).toFixed(2);
-
-      input.addEventListener("input", () => {
-        values[key] = Number(input.value);
-        if (output) output.textContent = Number(values[key]).toFixed(2);
-        saveFireTuning(values);
-      });
-    });
-
-    document.querySelector("#resetFireTuning")?.addEventListener("click", () => {
-      Object.assign(values, FIRE_TUNING_DEFAULTS);
-      saveFireTuning(values);
-      controls.forEach(input => {
-        const key = input.dataset.fireTune;
-        input.value = values[key];
-        const output = document.querySelector(`[data-fire-value="${key}"]`);
-        if (output) output.textContent = Number(values[key]).toFixed(2);
-      });
-    });
-  }
-
   function initMarkDoneFire() {
     const surface = document.querySelector(".complete-action > span");
     const input = document.querySelector(".current-check");
     if (!surface || !input || input.checked) return;
-
-    const fireTuning = loadFireTuning();
-    wireFireTuningControls(fireTuning);
 
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
       surface.classList.add("fire-static");
@@ -410,12 +355,6 @@
       varying vec2 v_uv;
       uniform float u_time;
       uniform vec2 u_resolution;
-      uniform float u_height;
-      uniform float u_scale;
-      uniform float u_turbulence;
-      uniform float u_speed;
-      uniform float u_brightness;
-      uniform float u_cutoff;
 
       float hash(vec2 p) {
         p = fract(p * vec2(123.34, 456.21));
@@ -451,26 +390,26 @@
 
       void main() {
         vec2 uv = v_uv;
-        float t = u_time * u_speed;
+        float t = u_time;
 
         // Three vertically stretched noise layers moving upward at different speeds.
         float slow = fbm(vec2(
-          uv.x * (6.0 * u_scale),
+          uv.x * 6.0,
           uv.y * 2.45 - t * 0.34
         ));
 
         float warp = fbm(vec2(
-          uv.x * (4.2 * u_scale) + 8.3,
+          uv.x * 4.2 + 8.3,
           uv.y * 2.0 - t * 0.22
         ));
 
         float mid = fbm(vec2(
-          uv.x * (12.0 * u_scale) + (warp - 0.5) * (1.8 * u_turbulence),
+          uv.x * 12.0 + (warp - 0.5) * 1.8,
           uv.y * 4.9 - t * 0.72
         ));
 
         float fine = fbm(vec2(
-          uv.x * (24.0 * u_scale) + (mid - 0.5) * (1.05 * u_turbulence),
+          uv.x * 24.0 + (mid - 0.5) * 1.05,
           uv.y * 9.4 - t * 1.28
         ));
 
@@ -482,16 +421,16 @@
           fine * 0.18;
 
         float breakup = smoothstep(0.30, 0.72, mid * 0.72 + fine * 0.28);
-        turbulence *= (0.72 + breakup * 0.48) * u_turbulence;
+        turbulence *= 0.72 + breakup * 0.48;
 
         // Continuous flame field: strong at the bottom and progressively
         // harder for noise to keep alive toward the top.
         float vertical = 1.0 - uv.y;
         float field =
-          vertical * u_height +
+          vertical * 0.98 +
           turbulence * 0.78;
 
-        float flame = smoothstep(u_cutoff, u_cutoff + 0.33, field);
+        float flame = smoothstep(0.69, 1.02, field);
 
         // Softly taper the very top so the fire stays contained inside the button.
         flame *= 1.0 - smoothstep(0.67, 0.98, uv.y);
@@ -517,7 +456,7 @@
         color = mix(color, hot, clamp(core * core * 0.55, 0.0, 1.0));
 
         float flicker = 0.90 + 0.10 * noise(vec2(uv.x * 16.0, t * 1.7));
-        float alpha = clamp((flame * 0.80 + core * 0.18) * flicker * u_brightness, 0.0, 0.96);
+        float alpha = clamp((flame * 0.80 + core * 0.18) * flicker, 0.0, 0.96);
 
         gl_FragColor = vec4(color * alpha, alpha);
       }
@@ -564,12 +503,6 @@
     const position = gl.getAttribLocation(program, "a_position");
     const timeLoc = gl.getUniformLocation(program, "u_time");
     const resolutionLoc = gl.getUniformLocation(program, "u_resolution");
-    const heightLoc = gl.getUniformLocation(program, "u_height");
-    const scaleLoc = gl.getUniformLocation(program, "u_scale");
-    const turbulenceLoc = gl.getUniformLocation(program, "u_turbulence");
-    const speedLoc = gl.getUniformLocation(program, "u_speed");
-    const brightnessLoc = gl.getUniformLocation(program, "u_brightness");
-    const cutoffLoc = gl.getUniformLocation(program, "u_cutoff");
 
     const buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -627,12 +560,6 @@
       gl.useProgram(program);
       gl.uniform1f(timeLoc, (now - start) * 0.001);
       gl.uniform2f(resolutionLoc, canvas.width, canvas.height);
-      gl.uniform1f(heightLoc, fireTuning.height);
-      gl.uniform1f(scaleLoc, fireTuning.scale);
-      gl.uniform1f(turbulenceLoc, fireTuning.turbulence);
-      gl.uniform1f(speedLoc, fireTuning.speed);
-      gl.uniform1f(brightnessLoc, fireTuning.brightness);
-      gl.uniform1f(cutoffLoc, fireTuning.cutoff);
 
       gl.clearColor(0,0,0,0);
       gl.clear(gl.COLOR_BUFFER_BIT);
@@ -674,22 +601,6 @@
           </label>
           ${side ? `<button class="skip-action" data-skip="${m.id}">Skip <span>→</span><small>Optional for progression</small></button>` : ""}
         </div>
-
-        <details class="fire-tuner">
-          <summary>
-            <span><strong>Flame tuning</strong><small>Temporary controls</small></span>
-            <b>⌄</b>
-          </summary>
-          <div class="fire-tuner-body">
-            <label><span>Height <output data-fire-value="height">0.98</output></span><input data-fire-tune="height" type="range" min="0.55" max="1.50" step="0.01" value="0.98"></label>
-            <label><span>Noise scale <output data-fire-value="scale">1.00</output></span><input data-fire-tune="scale" type="range" min="0.45" max="2.20" step="0.01" value="1.00"></label>
-            <label><span>Turbulence <output data-fire-value="turbulence">1.00</output></span><input data-fire-tune="turbulence" type="range" min="0.25" max="1.80" step="0.01" value="1.00"></label>
-            <label><span>Speed <output data-fire-value="speed">1.00</output></span><input data-fire-tune="speed" type="range" min="0.15" max="2.20" step="0.01" value="1.00"></label>
-            <label><span>Brightness <output data-fire-value="brightness">1.00</output></span><input data-fire-tune="brightness" type="range" min="0.30" max="1.80" step="0.01" value="1.00"></label>
-            <label><span>Cutoff <output data-fire-value="cutoff">0.69</output></span><input data-fire-tune="cutoff" type="range" min="0.42" max="0.95" step="0.01" value="0.69"></label>
-            <button id="resetFireTuning" type="button">Reset flame defaults</button>
-          </div>
-        </details>
 
         <section class="visible-details">
           <div class="unlock-line standalone-unlock"><span>UNLOCKS</span><strong>${m.unlock}</strong></div>
