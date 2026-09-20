@@ -386,45 +386,43 @@
         vec2 uv = v_uv;
         float t = u_time;
 
-        float coarse = fbm(vec2(uv.x * 5.0, uv.y * 3.2 - t * 0.62));
-        float fine = fbm(vec2(uv.x * 13.0 - t * 0.05, uv.y * 7.4 - t * 1.25));
+        // Organic forge turbulence: no fixed columns or repeating zig-zag shapes.
+        float warpA = fbm(vec2(uv.x * 3.2, uv.y * 2.2 - t * 0.38));
+        float warpB = fbm(vec2(uv.x * 6.7 + 9.3, uv.y * 3.8 - t * 0.72));
 
-        // Break the fire into narrow, independently moving tongues.
-        float xWarp =
-          (coarse - 0.5) * 0.095 +
-          sin(uv.y * 11.0 + t * 1.7 + uv.x * 7.0) * 0.018;
+        vec2 flowUv = vec2(
+          uv.x * 7.8 + (warpA - 0.5) * 1.35,
+          uv.y * 5.6 - t * 0.95
+        );
 
-        float columnCount = 9.0;
-        float columnX = (uv.x + xWarp) * columnCount;
-        float columnId = floor(columnX);
-        float localX = abs(fract(columnX) - 0.5) * 2.0;
+        float coarse = fbm(flowUv);
+        float fine = fbm(vec2(
+          uv.x * 15.5 + (warpB - 0.5) * 1.15,
+          uv.y * 10.0 - t * 1.45
+        ));
 
-        float rnd = hash(vec2(columnId, 4.73));
-        float width = mix(0.24, 0.46, rnd);
-        float tongueMask = 1.0 - smoothstep(width, width + 0.16, localX);
+        // Tall narrow pockets emerge naturally from the stretched noise field.
+        float pockets = smoothstep(0.54, 0.79, coarse * 0.78 + fine * 0.22);
 
-        float pulse = 0.5 + 0.5 * sin(t * mix(1.05, 1.8, rnd) + rnd * 6.2831);
-        float tongueHeight = mix(0.42, 0.78, rnd) + pulse * 0.11;
-        float raggedTop = (coarse - 0.5) * 0.16 + (fine - 0.5) * 0.07;
-        float heightMask = 1.0 - smoothstep(tongueHeight - 0.13, tongueHeight, uv.y + raggedTop);
+        // Strong base, rapidly tapering upward. Occasional noise lifts produce flame licks.
+        float baseHeight =
+          (1.0 - uv.y) * 1.16 +
+          (coarse - 0.5) * 0.38 +
+          (fine - 0.5) * 0.12;
 
-        // Keep a very small common base so the tongues feel connected to one fire.
-        float base = (1.0 - smoothstep(0.0, 0.15, uv.y)) * 0.28;
-        float body = clamp(tongueMask * heightMask + base, 0.0, 1.0);
-
-        float turbulence = 0.66 + coarse * 0.34 + fine * 0.12;
-        float flame = smoothstep(0.30, 0.82, body * turbulence);
-
-        float bottomFade = smoothstep(-0.03, 0.06, uv.y);
-        flame *= bottomFade;
+        float flame = smoothstep(0.78, 1.02, baseHeight) * pockets;
+        flame *= 1.0 - smoothstep(0.50, 0.90, uv.y);
+        flame *= smoothstep(-0.04, 0.07, uv.y);
 
         float core =
-          smoothstep(0.50, 0.96, body * (0.76 + coarse * 0.34)) *
-          (1.0 - smoothstep(0.0, 0.46, uv.y));
+          smoothstep(0.94, 1.14, baseHeight) *
+          smoothstep(0.60, 0.86, pockets) *
+          (1.0 - smoothstep(0.0, 0.40, uv.y));
 
         float rim =
-          smoothstep(0.22, 0.56, body * turbulence) -
-          smoothstep(0.61, 0.88, body * turbulence);
+          (smoothstep(0.70, 0.86, baseHeight) -
+           smoothstep(0.96, 1.08, baseHeight)) *
+          pockets;
 
         vec3 ember = vec3(0.47, 0.075, 0.018);
         vec3 orange = vec3(0.96, 0.25, 0.035);
