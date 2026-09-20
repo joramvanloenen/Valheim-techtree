@@ -28,33 +28,30 @@
   </header>
 
   <main>
-    <section class="dashboard panel">
+    <section class="dashboard panel compact-dashboard">
       <div class="progress-copy">
-        <div class="eyebrow">YOUR SAGA</div>
-        <div class="progress-title"><strong id="progressPercent">0%</strong> through the core path</div>
+        <div class="progress-row">
+          <div><span id="progressPercent">0%</span><small>core path</small></div>
+          <strong id="stepNumber">Step 1</strong>
+        </div>
         <div class="progress-track"><div id="progressBar"></div></div>
         <div class="progress-meta">
           <span id="coreProgress">No core milestones completed yet</span>
-          <span id="stepNumber">Step 1</span>
         </div>
       </div>
-      <div class="next-card">
-        <div class="eyebrow">CURRENT OBJECTIVE</div>
-        <div id="nextMilestoneTitle" class="next-title">Gather wood, stone and food</div>
-        <div id="nextMilestoneMeta" class="muted">Meadows</div>
-        <button id="jumpNext" class="primary">Go to objective ↓</button>
-      </div>
-    </section>
-
-    <section class="section route-section">
-      <div class="section-head">
-        <div><div class="eyebrow">YOUR JOURNEY</div><h2>Fog-of-war route</h2></div>
-        <p>Only places you have reached are named. The rest stay hidden until your journey gets there.</p>
-      </div>
-      <div id="biomeRail" class="biome-rail"></div>
     </section>
 
     <section id="roadmap" class="roadmap"></section>
+
+    <details class="route-drawer">
+      <summary>
+        <span><strong>Journey map</strong><small>See reached biomes and what remains hidden</small></span>
+        <b>⌄</b>
+      </summary>
+      <div class="route-drawer-body">
+        <div id="biomeRail" class="biome-rail"></div>
+      </div>
+    </details>
 
     <section class="journey-tools panel">
       <div>
