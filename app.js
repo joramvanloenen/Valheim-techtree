@@ -179,12 +179,111 @@
     }).join("");
   }
 
-  function prepareItems(need) {
-    if (!need || /^nothing$/i.test(need.trim())) return ["Nothing special — start exploring and gathering."];
+  const REQUIREMENT_OVERRIDES = {
+    "m-forage":[["20","Wood","starter target"],["10","Stone","starter target"],["3","Different foods","keep active"]],
+    "m-workbench":[["1","Hammer"],["10","Wood"]],
+    "m-rested":[["1","Shelter"],["1","Campfire"],["1","Bed"]],
+    "m-flint":[["VAR","Flint"],["VAR","Leather Scraps"],["VAR","Deer Hide"]],
+    "m-bow":[["10","Wood"],["8","Leather Scraps"]],
+    "m-antler":[["1","Hard Antler"],["10","Wood"]],
+    "bf-cores":[["10","Surtling Cores","early target"]],
+    "bf-smelt":[["10","Surtling Cores","5 per structure"],["40","Stone","20 per structure"]],
+    "bf-bronze":[["2","Copper","per Bronze"],["1","Tin","per Bronze"]],
+    "bf-finewood":[["1","Bronze Axe"]],
+    "bf-portal":[["20","Finewood"],["10","Greydwarf Eyes"],["2","Surtling Cores"]],
+    "bf-karve":[["30","Finewood"],["10","Deer Hide"],["20","Resin"],["80","Bronze Nails"]],
+    "bf-farm":[["5","Core Wood"],["5","Bronze"]],
+    "bf-cauldron":[["10","Tin","Cauldron"],["30","Finewood","Fermenter"],["5","Bronze","Fermenter"],["10","Resin","Fermenter"]],
+    "bf-key":[["1","Swamp Key"]],
+    "s-prep":[["1+","Poison Resistance Mead"],["3","Good foods","keep active"],["1","Portal kit"]],
+    "s-crypt":[["1","Swamp Key"],["1","Pickaxe"]],
+    "s-iron":[["1+","Scrap Iron"],["1","Smelter"]],
+    "s-ironpick":[["20","Iron","Iron Pickaxe"],["3","Core Wood","Iron Pickaxe"]],
+    "s-longship":[["40","Ancient Bark"],["40","Finewood"],["10","Deer Hide"],["100","Iron Nails"]],
+    "s-turnips":[["1+","Turnip Seeds"],["1","Cultivator"]],
+    "s-forge":[["VAR","Iron"],["VAR","Wood"],["VAR","Chain"],["VAR","Deer Hide"]],
+    "s-bones":[["10","Withered Bones"]],
+    "s-wishbone":[["1","Wishbone"]],
+    "mt-frost":[["1+","Frost Resistance Mead","until gear replaces it"]],
+    "mt-silver":[["1","Wishbone"],["1","Iron Pickaxe"]],
+    "mt-wolfgear":[["VAR","Silver"],["VAR","Wolf Pelts/Fangs"],["VAR","Loadout materials"]],
+    "mt-onions":[["1+","Onion Seeds"],["1","Cultivator"]],
+    "mt-caves":[["1+","Frost Caves","explore"]],
+    "p-outpost":[["1","Portal kit"],["3","Strong foods","keep active"],["1","Combat loadout"]],
+    "p-crops":[["1+","Barley"],["1+","Flax"]],
+    "p-gear":[["VAR","Iron"],["VAR","Linen Thread"],["VAR","Black Metal"]],
+    "p-firewine":[["1+","Fire Resistance Barley Wine"],["1","Fermenter"]],
+    "p-totems":[["5","Fuling Totems"]],
+    "p-wisps":[["1","Torn Spirit"],["10","Stone"]],
+    "mi-wisplight":[["1","Wisp"],["1","Silver"]],
+    "mi-materials":[["VAR","Yggdrasil Wood"],["VAR","Black Marble"]],
+    "mi-mines":[["5","Black Cores","minimum station target"],["9","Sealbreaker Fragments"]],
+    "mi-extractor":[["1","Dvergr Extractor"],["10","Yggdrasil Wood"],["5","Black Metal"]],
+    "mi-build":[["VAR","Mistlands materials","depends on build"]],
+    "mi-sealbreaker":[["9","Sealbreaker Fragments"]],
+    "mi-queen":[["1","Sealbreaker"]],
+    "mi-drakkar":[["VAR","Ceramic Plates"],["VAR","Late-game ship materials"]],
+    "a-sail":[["1","Drakkar"],["3","Strong foods"],["1+","Fire Resistance"],["1","Portal kit"]],
+    "a-beach":[["VAR","Building supplies"],["1","Portal"]],
+    "a-flametal":[["VAR","Flametal"],["VAR","Ashlands materials"]],
+    "a-fortress":[["1","Siege-capable kit"]],
+    "a-bells":[["9","Bell Fragments"],["3","Bells","result"]],
+    "a-upgrades":[["VAR","Flametal"],["VAR","Ashwood"],["VAR","Biome materials"]],
+    "a-fader":[["3","Bells"]],
+    "a-potential":[["1","Forge of Potential location"],["VAR","Idols"]],
+    "dn-embers":[["VAR","Embers","stock a supply"]],
+    "dn-land":[["1","Cold-ready loadout"],["VAR","Expedition supplies"]],
+    "dn-seals":[["2","Seal Pelts"],["1","Ember"],["10","Ember Charges","result"]],
+    "dn-tissue":[["1+","Ember Charges"],["VAR","Petrified Tissue","yield"]],
+    "dn-bloodgold":[["VAR","Petrified Tissue"],["1","Blast Furnace"]],
+    "dn-ice":[["10","Frost Cores"],["5","Ice","per Liquid Frost"]],
+    "dn-tunnels":[["20+","Frost Cores","10 kiln + 10 foundry"],["VAR","Moulds"]],
+    "dn-casting":[["10","Frost Cores"],["VAR","Bloodgold"],["VAR","Moulds"],["VAR","Liquid Frost"]],
+    "dn-key":[["15","Bloodgold"],["3","Intricate Key Moulds"],["3","Liquid Frost","one per key"],["3","Intricate Keys","result"]],
+    "dn-morkhalla":[["3","Intricate Keys"]],
+    "dn-blood":[["3","Mörkhalla invasions"],["3","Malicious Blood","result"]],
+    "dn-coal":[["VAR","Memorial Coal"],["VAR","Relevant essences"]],
+    "dn-smoker":[["VAR","Bloodgold"],["VAR","Timberwood"],["VAR","Moose Hide"],["VAR","Nornathread"]],
+    "dn-kall":[["3","Malicious Blood"]],
+    "dn-crown":[["1","Crown Jewel"],["5","Bloodgold"],["1","Sacrificial Blood","endgame handoff"]]
+  };
+
+  const ONE_EACH_HINTS = new Set([
+    "Hammer","Workbench","Smelter","Forge","Bronze Axe","Cultivator","Fermenter",
+    "Swamp Key","pickaxe","Wishbone","Iron Pickaxe","Artisan Table","Sealbreaker",
+    "Drakkar","Eternal Pyre","Blast Furnace"
+  ]);
+
+  function parseRequirementPart(part) {
+    const clean = part
+      .replace(/\s+at\s+.+$/i, "")
+      .replace(/\s+for\s+.+$/i, "")
+      .trim();
+
+    const numeric = clean.match(/^([\d,]+)\s+(.+)$/);
+    if (numeric) {
+      return {qty:numeric[1].replace(/,/g,""), name:numeric[2].replace(/\s+each$/i,"").trim(), note:/\beach$/i.test(clean) ? "each" : ""};
+    }
+
+    const one = [...ONE_EACH_HINTS].find(x => clean.toLowerCase() === x.toLowerCase());
+    if (one) return {qty:"1", name:clean, note:""};
+
+    return {qty:"VAR", name:clean, note:""};
+  }
+
+  function prepareItems(m) {
+    if (REQUIREMENT_OVERRIDES[m.id]) {
+      return REQUIREMENT_OVERRIDES[m.id].map(([qty,name,note=""]) => ({qty,name,note}));
+    }
+
+    const need = m.need || "";
+    if (/^nothing$/i.test(need.trim())) return [{qty:"VAR",name:"Supplies",note:"no fixed recipe"}];
+
     return need
-      .split(/\s*[+;]\s*/)
+      .split(/\s*[+;,]\s*/)
       .map(s => s.trim())
-      .filter(Boolean);
+      .filter(Boolean)
+      .map(parseRequirementPart);
   }
 
   function matchedGuides(m) {
@@ -212,7 +311,7 @@
 
   function questHtml(m, globalIndex) {
     const guides = matchedGuides(m);
-    const items = prepareItems(m.need);
+    const items = prepareItems(m);
     const side = m.type !== "core";
 
     return `<article class="quest-card compact-quest" id="currentQuest" style="--biomeColor:${m.stage.color};--biomeTint:${m.stage.tint}">
@@ -233,7 +332,7 @@
         <section class="essential-needs">
           <div class="section-label">NEEDED</div>
           <div class="need-chips">
-            ${items.map(item => `<span><i></i>${escapeHtml(item)}</span>`).join("")}
+            ${items.map(item => `<span class="need-item"><b class="need-qty">${escapeHtml(item.qty)}</b><span class="need-name">${escapeHtml(item.name)}${item.note ? `<small>${escapeHtml(item.note)}</small>` : ""}</span></span>`).join("")}
           </div>
         </section>
 
