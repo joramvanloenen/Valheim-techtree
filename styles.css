@@ -3379,3 +3379,52 @@ body{
     grid-template-columns:1fr;
   }
 }
+
+
+/* ---------- reset lives in header, not viewport ---------- */
+
+.hero-side{
+  flex:none;
+  align-self:stretch;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:16px;
+}
+
+.top-reset{
+  position:static;
+  z-index:auto;
+  top:auto;
+  right:auto;
+  flex:none;
+  padding:7px 10px;
+  border:1px solid rgba(229,138,104,.38);
+  border-radius:999px;
+  background:rgba(27,20,20,.62);
+  color:#efaa8f;
+  box-shadow:none;
+  backdrop-filter:none;
+  -webkit-backdrop-filter:none;
+}
+
+@media(max-width:560px){
+  .hero-inner{
+    padding-right:0;
+  }
+
+  .hero-side{
+    position:absolute;
+    top:0;
+    right:0;
+    align-self:auto;
+    display:block;
+  }
+
+  .top-reset{
+    position:static;
+    padding:6px 8px;
+    font-size:10px;
+  }
+}
