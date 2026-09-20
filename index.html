@@ -6,14 +6,10 @@
   <meta name="theme-color" content="#0e1516">
   <meta name="description" content="A spoiler-safe, step-by-step Valheim 1.0 progression guide.">
   <title>Valheim Progression Guide — The Viking Path</title>
-  <link rel="stylesheet" href="styles.css?v=20260920-14">
+  <link rel="stylesheet" href="styles.css?v=20260920-15">
 </head>
 <body>
   <div class="mist mist-a"></div><div class="mist mist-b"></div>
-
-  <button id="resetProgressTop" class="top-reset" type="button" aria-label="Reset progression">
-    <span aria-hidden="true">↺</span> Reset
-  </button>
 
   <dialog id="resetDialog" class="reset-dialog">
     <form method="dialog">
@@ -39,7 +35,12 @@
           <span>Progress saves locally</span>
         </div>
       </div>
-      <div class="rune-mark" aria-hidden="true">ᛉ</div>
+      <div class="hero-side">
+        <button id="resetProgressTop" class="top-reset" type="button" aria-label="Reset progress">
+          <span aria-hidden="true">↺</span> Reset progress
+        </button>
+        <div class="rune-mark" aria-hidden="true">ᛉ</div>
+      </div>
     </div>
   </header>
 
@@ -150,7 +151,7 @@
 
   <footer>Unofficial fan guide. Valheim and its game assets belong to Iron Gate AB. No game assets are redistributed here.</footer>
 
-  <script src="data.js?v=20260920-14"></script>
-  <script src="app.js?v=20260920-14"></script>
+  <script src="data.js?v=20260920-15"></script>
+  <script src="app.js?v=20260920-15"></script>
 </body>
 </html>
