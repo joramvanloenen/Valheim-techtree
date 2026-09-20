@@ -229,35 +229,43 @@
       <div class="quest-body">
         <section class="goal-card">
           <div class="goal-icon">◎</div>
-          <div>
-            <div class="eyebrow">CLEAR GOAL</div>
+          <div class="goal-content">
+            <div class="goal-label">YOUR OBJECTIVE</div>
             <h3>${m.do}</h3>
-            <p>Once this is done, your progression opens: <strong>${m.unlock}</strong>.</p>
+            <div class="unlock-line"><span>UNLOCKS</span><strong>${m.unlock}</strong></div>
           </div>
         </section>
 
         <section class="quest-section">
-          <div class="section-label">WHAT YOU NEED</div>
+          <div class="section-heading">
+            <div class="section-label">WHAT YOU NEED</div>
+            <p>Gather these before you commit to the objective.</p>
+          </div>
           <div class="need-chips">
-            ${items.map(item => `<span>${escapeHtml(item)}</span>`).join("")}
+            ${items.map(item => `<span><i></i>${escapeHtml(item)}</span>`).join("")}
           </div>
         </section>
 
         <section class="quest-section">
-          <div class="section-label">HOW TO GET IT</div>
+          <div class="section-heading">
+            <div class="section-label">HOW TO GET IT</div>
+            <p>Where the important requirements come from.</p>
+          </div>
           ${guides.length ? `
             <div class="acquisition-grid">
-              ${guides.map(([name,tip]) => `<div class="acquisition"><strong>${name}</strong><p>${tip}</p></div>`).join("")}
+              ${guides.map(([name,tip]) => `<div class="acquisition"><div class="acquisition-name">${name}</div><p>${tip}</p></div>`).join("")}
             </div>`
-          : `<div class="acquisition fallback"><strong>Follow the previous unlock</strong><p>${m.summary} Your immediate action is: ${m.do}. If a named item was just unlocked by the previous objective, craft or collect it before moving on.</p></div>`}
+          : `<div class="acquisition fallback"><div class="acquisition-name">Follow the previous unlock</div><p>${m.summary} Your immediate action is: ${m.do}. If a named item was just unlocked by the previous objective, craft or collect it before moving on.</p></div>`}
         </section>
 
         <section class="quest-section route-box">
-          <div class="section-label">DO THIS NOW</div>
-          <ol>
-            <li><strong>Prepare:</strong> gather the requirements above before committing to the trip or fight.</li>
-            <li><strong>Execute:</strong> ${m.do}.</li>
-            <li><strong>Confirm:</strong> only mark this step complete once the objective is actually finished in your world.</li>
+          <div class="section-heading compact">
+            <div class="section-label">DO THIS NOW</div>
+          </div>
+          <ol class="action-steps">
+            <li><span>1</span><div><strong>Prepare</strong><p>Gather the requirements above before committing to the trip or fight.</p></div></li>
+            <li><span>2</span><div><strong>Execute</strong><p>${m.do}.</p></div></li>
+            <li><span>3</span><div><strong>Confirm</strong><p>Mark the step complete only when the objective is actually finished in your world.</p></div></li>
           </ol>
         </section>
 
