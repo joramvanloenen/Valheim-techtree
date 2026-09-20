@@ -309,6 +309,214 @@
     return chosen.map(([,value]) => value);
   }
 
+  function initMarkDoneFire() {
+    const surface = document.querySelector(".complete-action > span");
+    const input = document.querySelector(".current-check");
+    if (!surface || !input || input.checked) return;
+
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      surface.classList.add("fire-static");
+      return;
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.className = "markdone-fire";
+    canvas.setAttribute("aria-hidden", "true");
+    surface.prepend(canvas);
+
+    const gl = canvas.getContext("webgl", {
+      alpha:true,
+      antialias:false,
+      depth:false,
+      stencil:false,
+      premultipliedAlpha:true,
+      powerPreference:"low-power"
+    });
+
+    if (!gl) {
+      canvas.remove();
+      surface.classList.add("fire-static");
+      return;
+    }
+
+    const vertexSource = `
+      attribute vec2 a_position;
+      varying vec2 v_uv;
+      void main() {
+        v_uv = a_position * 0.5 + 0.5;
+        gl_Position = vec4(a_position, 0.0, 1.0);
+      }
+    `;
+
+    const fragmentSource = `
+      precision mediump float;
+      varying vec2 v_uv;
+      uniform float u_time;
+      uniform vec2 u_resolution;
+
+      float hash(vec2 p) {
+        p = fract(p * vec2(123.34, 456.21));
+        p += dot(p, p + 45.32);
+        return fract(p.x * p.y);
+      }
+
+      float noise(vec2 p) {
+        vec2 i = floor(p);
+        vec2 f = fract(p);
+        f = f * f * (3.0 - 2.0 * f);
+        float a = hash(i);
+        float b = hash(i + vec2(1.0, 0.0));
+        float c = hash(i + vec2(0.0, 1.0));
+        float d = hash(i + vec2(1.0, 1.0));
+        return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+      }
+
+      float fbm(vec2 p) {
+        float value = 0.0;
+        float amp = 0.5;
+        for (int i = 0; i < 5; i++) {
+          value += amp * noise(p);
+          p = p * 2.03 + vec2(17.1, 9.2);
+          amp *= 0.5;
+        }
+        return value;
+      }
+
+      void main() {
+        vec2 uv = v_uv;
+        float t = u_time;
+
+        float drift = sin(uv.y * 8.0 + t * 1.35) * 0.055;
+        vec2 p = vec2((uv.x + drift) * 4.3, uv.y * 3.25 - t * 0.72);
+
+        float large = fbm(p);
+        float detail = fbm(vec2(uv.x * 8.5 - t * 0.08, uv.y * 6.2 - t * 1.18));
+        float center = 1.0 - abs(uv.x - 0.5) * 0.28;
+        float vertical = 1.0 - uv.y;
+
+        float field = vertical * 0.82 + large * 0.62 + detail * 0.18 + center * 0.08;
+        float flame = smoothstep(0.62, 0.92, field);
+
+        float topFade = 1.0 - smoothstep(0.62, 1.0, uv.y);
+        float bottomFade = smoothstep(-0.08, 0.10, uv.y);
+        flame *= topFade * bottomFade;
+
+        float core = smoothstep(0.82, 1.12, field) * (1.0 - smoothstep(0.0, 0.58, uv.y));
+        float rim = smoothstep(0.58, 0.78, field) - smoothstep(0.82, 0.98, field);
+
+        vec3 ember = vec3(0.47, 0.075, 0.018);
+        vec3 orange = vec3(0.96, 0.25, 0.035);
+        vec3 amber = vec3(1.0, 0.56, 0.10);
+        vec3 hot = vec3(1.0, 0.87, 0.48);
+
+        vec3 color = mix(ember, orange, clamp(flame * 1.35 + rim * 0.45, 0.0, 1.0));
+        color = mix(color, amber, clamp(core * 1.15, 0.0, 1.0));
+        color = mix(color, hot, clamp(core * core * 0.72, 0.0, 1.0));
+
+        float alpha = flame * 0.68 + core * 0.16;
+        alpha *= 0.80 + 0.20 * noise(vec2(uv.x * 14.0, t * 2.0));
+
+        gl_FragColor = vec4(color * alpha, alpha);
+      }
+    `;
+
+    function compile(type, source) {
+      const shader = gl.createShader(type);
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        gl.deleteShader(shader);
+        return null;
+      }
+      return shader;
+    }
+
+    const vs = compile(gl.VERTEX_SHADER, vertexSource);
+    const fs = compile(gl.FRAGMENT_SHADER, fragmentSource);
+    if (!vs || !fs) {
+      canvas.remove();
+      surface.classList.add("fire-static");
+      return;
+    }
+
+    const program = gl.createProgram();
+    gl.attachShader(program, vs);
+    gl.attachShader(program, fs);
+    gl.linkProgram(program);
+    gl.deleteShader(vs);
+    gl.deleteShader(fs);
+
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      gl.deleteProgram(program);
+      canvas.remove();
+      surface.classList.add("fire-static");
+      return;
+    }
+
+    gl.useProgram(program);
+    const position = gl.getAttribLocation(program, "a_position");
+    const timeLoc = gl.getUniformLocation(program, "u_time");
+    const resolutionLoc = gl.getUniformLocation(program, "u_resolution");
+
+    const buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+      -1,-1, 1,-1, -1,1,
+      -1,1, 1,-1, 1,1
+    ]), gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(position);
+    gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+
+    function resize() {
+      const rect = surface.getBoundingClientRect();
+      const scale = Math.min(window.devicePixelRatio || 1, 1.25) * 0.72;
+      const w = Math.max(2, Math.min(520, Math.round(rect.width * scale)));
+      const h = Math.max(2, Math.min(120, Math.round(rect.height * scale)));
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+        gl.viewport(0, 0, w, h);
+      }
+    }
+
+    resize();
+    const ro = window.ResizeObserver ? new ResizeObserver(resize) : null;
+    ro?.observe(surface);
+
+    const start = performance.now();
+    let last = 0;
+
+    function frame(now) {
+      if (!canvas.isConnected) {
+        ro?.disconnect();
+        gl.deleteBuffer(buffer);
+        gl.deleteProgram(program);
+        return;
+      }
+      if (input.checked) {
+        canvas.classList.add("is-extinguished");
+        ro?.disconnect();
+        return;
+      }
+      if (document.hidden || now - last < 33) {
+        requestAnimationFrame(frame);
+        return;
+      }
+
+      last = now;
+      resize();
+      gl.useProgram(program);
+      gl.uniform1f(timeLoc, (now - start) * 0.001);
+      gl.uniform2f(resolutionLoc, canvas.width, canvas.height);
+      gl.clearColor(0,0,0,0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+      requestAnimationFrame(frame);
+    }
+
+    requestAnimationFrame(frame);
+  }
+
   function questHtml(m, globalIndex) {
     const guides = matchedGuides(m);
     const items = prepareItems(m);
@@ -388,6 +596,7 @@
       </article>`;
     } else {
       $("#roadmap").innerHTML = questHtml(current, index);
+      initMarkDoneFire();
       $(".current-check")?.addEventListener("change", e => {
         if (!e.target.checked) return;
         const id = e.target.dataset.id;
