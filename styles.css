@@ -3084,3 +3084,104 @@ body{
       #0a151c;
   }
 }
+
+
+/* ---------- prominent primary completion action ---------- */
+
+:root{
+  --action:#6478ff;
+  --action-hover:#7587ff;
+  --action-dark:#4d5fd1;
+}
+
+.complete-action>span{
+  min-height:76px;
+  grid-template-columns:46px minmax(0,1fr);
+  column-gap:14px;
+  padding:14px 17px;
+  border:0;
+  border-radius:13px;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.09),transparent 48%),
+    var(--action-dark);
+  box-shadow:0 8px 22px rgba(70,88,210,.22);
+}
+
+.complete-action>span>b{
+  width:40px;
+  height:40px;
+  border:2px solid rgba(255,255,255,.78);
+  border-radius:10px;
+  background:rgba(7,12,34,.16);
+  box-shadow:none;
+}
+
+.complete-action>span>strong{
+  color:#fff;
+  font-size:18px;
+  line-height:1.2;
+  font-weight:820;
+}
+
+.complete-action>span>small{
+  margin-top:3px;
+  color:rgba(255,255,255,.72);
+  font-size:12px;
+  line-height:1.25;
+}
+
+.complete-action:hover>span{
+  border:0;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.11),transparent 48%),
+    var(--action-hover);
+  box-shadow:0 10px 26px rgba(79,97,226,.28);
+  transform:translateY(-1px);
+}
+
+/* Checked becomes a different semantic state: green, not blue. */
+.complete-action input:checked + span{
+  border:0;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.08),transparent 48%),
+    #4f8a45;
+  box-shadow:0 8px 22px rgba(66,130,58,.20);
+}
+
+.complete-action input:checked + span>b{
+  border-color:#dff5d3;
+  background:#a8df89;
+  color:#173112;
+}
+
+.complete-action input:checked + span:hover{
+  border:0;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.10),transparent 48%),
+    #5b9a50;
+}
+
+@media(max-width:560px){
+  .compact-actions .complete-action>span{
+    min-height:66px;
+    grid-template-columns:40px minmax(0,1fr);
+    column-gap:12px;
+    padding:12px 14px;
+    border-radius:12px;
+  }
+
+  .compact-actions .complete-action>span>b{
+    width:36px;
+    height:36px;
+    border-radius:9px;
+    font-size:17px;
+  }
+
+  .compact-actions .complete-action>span>strong{
+    font-size:16px;
+  }
+
+  .compact-actions .complete-action>span>small{
+    font-size:11px;
+  }
+}
