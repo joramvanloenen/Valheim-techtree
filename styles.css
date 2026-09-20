@@ -4059,3 +4059,21 @@ body{
     display:none;
   }
 }
+
+
+/* ---------- make WebGL flames visually distinct ---------- */
+
+.markdone-fire{
+  opacity:.94;
+  mix-blend-mode:normal;
+}
+
+.complete-action:hover>span .markdone-fire{
+  opacity:1;
+}
+
+@media(max-width:560px){
+  .markdone-fire{
+    opacity:.90;
+  }
+}
