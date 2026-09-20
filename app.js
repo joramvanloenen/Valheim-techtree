@@ -524,11 +524,28 @@
     if (historyOpen) $("#history").scrollIntoView({behavior:"smooth", block:"start"});
   });
 
-  $("#resetProgress").addEventListener("click", () => {
-    if (!confirm("Reset every completed and skipped Valheim step on this device?")) return;
+  function resetAllProgress() {
     progress = {};
     saveProgress();
     renderAll(true);
+  }
+
+  const resetTop = $("#resetProgressTop");
+  const resetDialog = $("#resetDialog");
+  const confirmReset = $("#confirmReset");
+
+  resetTop?.addEventListener("click", () => {
+    if (resetDialog?.showModal) {
+      resetDialog.showModal();
+    } else if (confirm("Are you sure you want to reset all progression?")) {
+      resetAllProgress();
+    }
+  });
+
+  confirmReset?.addEventListener("click", e => {
+    e.preventDefault();
+    resetDialog?.close();
+    resetAllProgress();
   });
 
   ["skillCurrent","skillTarget"].forEach(id => $("#" + id)?.addEventListener("input", updateSkillCalc));
