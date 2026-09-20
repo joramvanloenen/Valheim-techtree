@@ -2703,3 +2703,384 @@ footer{
     padding:9px 2px 4px;
   }
 }
+
+
+/* ---------- higher-contrast, multi-hue theme ---------- */
+
+:root{
+  --bg:#071014;
+  --panel:#10191c;
+  --panel-raised:#172126;
+  --panel-deep:#0a1216;
+
+  --line:#2a3d43;
+  --line-strong:#426069;
+
+  --text:#f5f6f2;
+  --text-soft:#cbd4d1;
+  --muted:#91a29f;
+
+  --gold:#f0bd5b;
+  --gold-soft:rgba(240,189,91,.13);
+
+  --ice:#66d7e5;
+  --ice-soft:rgba(102,215,229,.11);
+
+  --green:#91cf72;
+  --green-soft:rgba(145,207,114,.13);
+
+  --violet:#b49af2;
+  --violet-soft:rgba(180,154,242,.11);
+
+  --rust:#e58a68;
+  --rust-soft:rgba(229,138,104,.11);
+
+  --blue:#69aef2;
+  --blue-soft:rgba(105,174,242,.10);
+
+  --moss:#aebd63;
+  --moss-soft:rgba(174,189,99,.10);
+}
+
+body{
+  background:
+    radial-gradient(circle at 82% -5%,rgba(74,133,167,.25) 0,transparent 30%),
+    radial-gradient(circle at -5% 46%,rgba(121,112,55,.14) 0,transparent 25%),
+    linear-gradient(180deg,#081317 0%,#071014 55%,#080d13 100%);
+}
+
+/* Brand: stronger warm/cool contrast */
+.hero{
+  background:
+    linear-gradient(100deg,rgba(240,189,91,.045),transparent 42%),
+    linear-gradient(180deg,rgba(34,70,79,.30),rgba(7,16,20,.05));
+  border-bottom-color:#28444c;
+}
+
+.hero h1{
+  color:#f7f5ed;
+}
+
+.hero h1 span{
+  color:#70e0ec;
+}
+
+.hero .eyebrow{
+  color:#f0bd5b;
+}
+
+/* Current objective: warmer than the rest of the UI */
+.compact-quest{
+  border-color:#40564d;
+  background:#0e1818;
+}
+
+.compact-quest-head{
+  background:
+    linear-gradient(115deg,rgba(174,189,99,.16),rgba(240,189,91,.055) 46%,transparent 75%),
+    #111a1a;
+}
+
+.compact-meta{
+  color:#9daaa6;
+}
+
+.compact-meta .compact-biome{
+  color:#c6d77a;
+}
+
+.compact-quest-head h2{
+  color:#fbfaf4;
+}
+
+.essential-action>span{
+  color:#f0bd5b;
+}
+
+.essential-action>strong{
+  color:#ffe7ad;
+}
+
+/* Resources: clearly cyan, but flat */
+.essential-needs .section-label{
+  color:#80dce7;
+}
+
+.compact-quest .need-chips > .need-item{
+  background:rgba(54,145,160,.13);
+}
+
+.compact-quest .need-chips > .need-item .need-qty{
+  background:rgba(66,184,201,.22);
+  color:#9cebf2;
+}
+
+.compact-quest .need-chips > .need-item .need-name{
+  color:#e6f8f8;
+}
+
+/* Main completion: unmistakably green only when complete */
+.complete-action>span{
+  border-color:#46615b;
+  background:#0b1515;
+}
+
+.complete-action>span>b{
+  border-color:#738984;
+}
+
+.complete-action input:checked + span{
+  border-color:#6b9b58;
+  background:rgba(91,143,73,.20);
+}
+
+.complete-action input:checked + span>b{
+  border-color:#9bdb79;
+  background:#9bdb79;
+}
+
+/* Why/unlocks/checklist get distinct accents without more boxes */
+.visible-details .detail-intro>.section-label{
+  color:#efb95c;
+}
+
+.visible-details .detail-intro>p{
+  color:#d4d9d3;
+}
+
+.unlock-line span{
+  color:#aa9bcf;
+}
+
+.unlock-line strong{
+  color:#c9afff;
+}
+
+.visible-checklist>.section-label{
+  color:#9eb0ad;
+}
+
+.visible-checklist .action-steps li>span{
+  background:rgba(105,174,242,.13);
+  color:#8bc4fb;
+}
+
+.visible-checklist .action-steps strong{
+  color:#edf2ef;
+}
+
+/* Acquisition help: blue/cyan */
+.where-to-get{
+  border-color:rgba(67,138,151,.42);
+  background:rgba(8,25,29,.55);
+}
+
+.where-to-get>summary strong{
+  color:#78dfeb;
+}
+
+.where-to-get>summary small{
+  color:#9eb2b1;
+}
+
+.where-to-get[open]>summary{
+  background:rgba(51,125,139,.10);
+}
+
+.acquisition{
+  border-color:#28444a;
+  background:#0b171a;
+}
+
+.acquisition-name{
+  color:#79dfeb;
+}
+
+/* Progress + Journey: two clearly different halves in one panel */
+.status-panel{
+  border-color:#364b51;
+  background:#0a1215;
+}
+
+.status-core{
+  background:
+    linear-gradient(135deg,rgba(240,189,91,.19),rgba(145,119,46,.08)),
+    #171812;
+}
+
+.status-heading>span,
+.status-progress-line>strong{
+  color:#f3c45f;
+}
+
+.status-progress-line .progress-track{
+  background:#15170e;
+  border-color:#343821;
+}
+
+.progress-track>div{
+  background:linear-gradient(90deg,#92cc67,#e0c75f);
+}
+
+.status-route{
+  border-color:#294754;
+  background:
+    linear-gradient(135deg,rgba(70,142,208,.20),rgba(60,112,159,.07)),
+    #0a151c;
+}
+
+.status-route>summary strong,
+.status-route>summary>b{
+  color:#7ec3ff;
+}
+
+.status-route .biome-node.current .biome-dot{
+  border-color:#73bdf8;
+  color:#9fd3ff;
+  box-shadow:0 0 0 5px rgba(105,174,242,.09);
+}
+
+/* Utility controls remain quiet/neutral */
+.journey-tools{
+  background:
+    linear-gradient(135deg,rgba(83,103,105,.07),transparent),
+    #0d1517;
+}
+
+.ghost{
+  border-color:#34484d;
+  background:#0c1518;
+}
+
+/* Codex / sources: its own violet identity */
+.library-drawer{
+  border-color:#493f61;
+  background:
+    linear-gradient(135deg,rgba(180,154,242,.07),transparent 42%),
+    #11121a;
+}
+
+.library-drawer>summary strong{
+  color:#d7c8ff;
+}
+
+.library-drawer>summary>b{
+  color:#ad96e7;
+}
+
+.library-drawer[open]>summary{
+  background:rgba(180,154,242,.07);
+  border-bottom-color:#463d5a;
+}
+
+.library-drawer[open]>summary>b{
+  color:#c4adff;
+}
+
+.library-section-title>span{
+  color:#bba3f3;
+}
+
+.library-section-title>strong{
+  color:#e1daf5;
+}
+
+.spoiler-reference{
+  border-color:#3c374b;
+  background:#11131a;
+}
+
+.spoiler-reference summary:hover{
+  background:#171723;
+}
+
+.spoiler-pill{
+  border-color:#88533f;
+  color:#f0a07e;
+  background:rgba(229,138,104,.07);
+}
+
+.spoiler-pill.soft{
+  border-color:#66548c;
+  color:#c7b2fa;
+  background:rgba(180,154,242,.07);
+}
+
+.station,
+.skill,
+.source-grid a{
+  background:#10131a;
+  border-color:#38374a;
+}
+
+.station .eyebrow,
+.calc-result strong{
+  color:#bda5f2;
+}
+
+.skill-calculator input{
+  background:#0b0d13;
+  border-color:#464159;
+}
+
+.skill-calculator input:focus{
+  border-color:#9a83d2;
+}
+
+/* Research links lean blue to distinguish them from Codex content */
+.library-sources .library-section-title>span{
+  color:#6fb8f5;
+}
+
+.source-grid a:hover{
+  border-color:#5f91bd;
+  background:#111a23;
+}
+
+/* Danger actions use warm rust, not the general accent */
+.ghost.danger:hover{
+  border-color:#985b45;
+  color:#ffb092;
+  background:rgba(229,138,104,.07);
+}
+
+/* Improve text contrast where muted text was getting too quiet */
+.compact-meta,
+.need-name small,
+.status-note,
+.where-to-get>summary small,
+.action-steps p,
+.library-drawer>summary small,
+.spoiler-reference summary small{
+  color:#9eadaa;
+}
+
+@media(max-width:560px){
+  .hero{
+    background:
+      linear-gradient(100deg,rgba(240,189,91,.05),transparent 50%),
+      linear-gradient(180deg,rgba(36,79,90,.36),rgba(7,16,20,.02));
+  }
+
+  .compact-quest{
+    border-color:#435e55;
+  }
+
+  .compact-quest-head{
+    background:
+      linear-gradient(120deg,rgba(174,189,99,.17),rgba(240,189,91,.045) 58%,transparent),
+      #111a1a;
+  }
+
+  .status-core{
+    background:
+      linear-gradient(120deg,rgba(240,189,91,.20),rgba(140,114,45,.07)),
+      #171812;
+  }
+
+  .status-route{
+    background:
+      linear-gradient(120deg,rgba(70,142,208,.21),rgba(52,102,148,.07)),
+      #0a151c;
+  }
+}
