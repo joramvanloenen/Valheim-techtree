@@ -3994,3 +3994,68 @@ body{
     opacity:.48;
   }
 }
+
+
+/* ---------- WebGL fire replaces the old CSS flame blobs ---------- */
+
+.complete-action>span::before,
+.complete-action>span::after{
+  content:none !important;
+  display:none !important;
+  animation:none !important;
+}
+
+.markdone-fire{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  width:100%;
+  height:100%;
+  display:block;
+  pointer-events:none;
+  opacity:.72;
+  mix-blend-mode:screen;
+  transition:opacity .22s ease;
+}
+
+.markdone-fire.is-extinguished,
+.complete-action input:checked + span .markdone-fire{
+  opacity:0;
+}
+
+.complete-action>span>b,
+.complete-action>span>strong,
+.complete-action>span>small{
+  position:relative;
+  z-index:2;
+}
+
+.complete-action>span::selection,
+.complete-action>span *::selection{
+  background:rgba(255,220,150,.18);
+}
+
+.complete-action>span.fire-static{
+  background:
+    radial-gradient(ellipse at 50% 115%,rgba(225,103,43,.34),transparent 56%),
+    linear-gradient(135deg,rgba(255,226,184,.06),transparent 50%),
+    var(--action-dark);
+}
+
+.complete-action input:checked + span.fire-static{
+  background:
+    linear-gradient(135deg,rgba(241,235,198,.06),transparent 50%),
+    #617845;
+}
+
+@media(max-width:560px){
+  .markdone-fire{
+    opacity:.66;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .markdone-fire{
+    display:none;
+  }
+}
