@@ -4,19 +4,24 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#0e1516">
-  <meta name="description" content="Interactive Valheim 1.0 progression and tech-tree guide from Meadows to Deep North.">
-  <title>Valheim Tech Tree — Road to the Deep North</title>
+  <meta name="description" content="A spoiler-safe, step-by-step Valheim 1.0 progression guide.">
+  <title>Valheim Progression Guide — The Viking Path</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="mist mist-a"></div><div class="mist mist-b"></div>
+
   <header class="hero">
     <div class="hero-inner">
       <div>
-        <div class="eyebrow">VALHEIM 1.0 PROGRESSION TRACKER</div>
-        <h1>Road to the <span>Deep North</span></h1>
-        <p class="lede">A milestone-by-milestone route through every biome, boss gate, crafting tier, side unlock and skill system.</p>
-        <div class="badges"><span>Current target: 1.0.15</span><span>Updated Sep 20, 2026</span><span>Progress saves locally</span></div>
+        <div class="eyebrow">VALHEIM 1.0 • GUIDED PROGRESSION</div>
+        <h1>The Viking <span>Path</span></h1>
+        <p class="lede">One objective at a time. Finish the current task to reveal the next, with future biomes and bosses kept under fog of war.</p>
+        <div class="badges">
+          <span>Spoiler-safe by default</span>
+          <span>Target: 1.0.15</span>
+          <span>Progress saves locally</span>
+        </div>
       </div>
       <div class="rune-mark" aria-hidden="true">ᛉ</div>
     </div>
@@ -25,83 +30,97 @@
   <main>
     <section class="dashboard panel">
       <div class="progress-copy">
-        <div class="eyebrow">YOUR RUN</div>
-        <div class="progress-title"><strong id="progressPercent">0%</strong> complete</div>
+        <div class="eyebrow">YOUR SAGA</div>
+        <div class="progress-title"><strong id="progressPercent">0%</strong> through the core path</div>
         <div class="progress-track"><div id="progressBar"></div></div>
-        <div class="progress-meta"><span id="coreProgress">0 / 0 core milestones</span><span id="allProgress">0 / 0 total</span></div>
+        <div class="progress-meta">
+          <span id="coreProgress">No core milestones completed yet</span>
+          <span id="stepNumber">Step 1</span>
+        </div>
       </div>
       <div class="next-card">
-        <div class="eyebrow">NEXT CORE MILESTONE</div>
-        <div id="nextMilestoneTitle" class="next-title">Gather wood and stone</div>
+        <div class="eyebrow">CURRENT OBJECTIVE</div>
+        <div id="nextMilestoneTitle" class="next-title">Gather wood, stone and food</div>
         <div id="nextMilestoneMeta" class="muted">Meadows</div>
-        <button id="jumpNext" class="primary">Jump to it →</button>
+        <button id="jumpNext" class="primary">Go to objective ↓</button>
       </div>
     </section>
 
-    <section class="controls">
-      <label class="search">
-        <span>⌕</span>
-        <input id="searchInput" type="search" placeholder="Find an unlock: portal, iron, magic, Drakkar…">
-      </label>
-      <div class="filters" id="filters">
-        <button class="chip active" data-filter="all">All</button>
-        <button class="chip" data-filter="core">Core path</button>
-        <button class="chip" data-filter="optional">Side unlocks</button>
-        <button class="chip" data-filter="crafting">Crafting</button>
-      </div>
-      <button id="resetProgress" class="ghost">Reset progress</button>
-    </section>
-
-    <section class="section">
+    <section class="section route-section">
       <div class="section-head">
-        <div><div class="eyebrow">BIOME ROUTE</div><h2>The main road</h2></div>
-        <p>Bosses are progression gates, but the useful tech often comes from the preparation before them.</p>
+        <div><div class="eyebrow">YOUR JOURNEY</div><h2>Fog-of-war route</h2></div>
+        <p>Only places you have reached are named. The rest stay hidden until your journey gets there.</p>
       </div>
       <div id="biomeRail" class="biome-rail"></div>
     </section>
 
     <section id="roadmap" class="roadmap"></section>
 
-    <section class="section" id="stationsSection">
-      <div class="section-head">
-        <div><div class="eyebrow">CRAFTING TECH</div><h2>Station ladder</h2></div>
-        <p>Every station upgrade in one place, including the new 1.0 Deep North extensions.</p>
+    <section class="journey-tools panel">
+      <div>
+        <div class="eyebrow">PROGRESS TOOLS</div>
+        <strong>Need to undo something?</strong>
+        <p>Your completed and skipped steps are stored only in this browser.</p>
       </div>
-      <div id="stations" class="station-grid"></div>
+      <div class="tool-actions">
+        <button id="toggleHistory" class="ghost">Show completed steps</button>
+        <button id="resetProgress" class="ghost danger">Reset progress</button>
+      </div>
     </section>
+    <section id="history" class="history panel" hidden></section>
 
-    <section class="section" id="skillsSection">
+    <section class="section reference-section">
       <div class="section-head">
-        <div><div class="eyebrow">CHARACTER LEVELING</div><h2>Skills, not XP levels</h2></div>
-        <p>Valheim has no character level. Each skill independently levels from 0 to 100 by using it.</p>
+        <div><div class="eyebrow">OPTIONAL REFERENCE</div><h2>Codex</h2></div>
+        <p>The guide above stays spoiler-safe. Open these only when you deliberately want the full reference tables.</p>
       </div>
-      <div class="skill-explainer panel">
-        <div><strong>24 skills</strong><span>Each caps at 100</span></div>
-        <div><strong>Use it to level it</strong><span>Weapons, movement, crafting and professions all train separately</span></div>
-        <div><strong>Death matters</strong><span>Default death penalty removes about 5% from every skill; a 10-minute no-skill-drain grace period follows</span></div>
-      </div>
-      <div class="skill-planner panel">
-        <div class="skill-calculator">
-          <div><div class="eyebrow">XP CURVE</div><h3>Skill level calculator</h3></div>
-          <label>Current level <input id="skillCurrent" type="number" min="0" max="99" value="20"></label>
-          <label>Target level <input id="skillTarget" type="number" min="1" max="100" value="40"></label>
-          <div class="calc-result"><strong id="skillXp">—</strong><span>approx. XP required between those levels</span></div>
+
+      <details class="spoiler-reference">
+        <summary>
+          <span><strong>Crafting station ladder</strong><small>Contains future station and material names</small></span>
+          <span class="spoiler-pill">SPOILERS</span>
+        </summary>
+        <div class="reference-body">
+          <div id="stations" class="station-grid"></div>
         </div>
-        <p class="tiny">The game’s skill XP requirement rises roughly as 0.5 × (level + 1)<sup>1.5</sup> + 0.5. XP gained per action differs by skill and action.</p>
-      </div>
-      <div id="skills" class="skill-grid"></div>
+      </details>
+
+      <details class="spoiler-reference">
+        <summary>
+          <span><strong>Skills & leveling reference</strong><small>24 skills, death penalty and XP calculator</small></span>
+          <span class="spoiler-pill soft">REFERENCE</span>
+        </summary>
+        <div class="reference-body">
+          <div class="skill-explainer panel inset">
+            <div><strong>24 skills</strong><span>Each independently caps at 100</span></div>
+            <div><strong>Use it to level it</strong><span>Weapons, movement, crafting and professions train separately</span></div>
+            <div><strong>Death matters</strong><span>Default death penalty removes about 5% from every skill, followed by a no-skill-drain grace period</span></div>
+          </div>
+          <div class="skill-planner panel inset">
+            <div class="skill-calculator">
+              <div><div class="eyebrow">XP CURVE</div><h3>Skill level calculator</h3></div>
+              <label>Current level <input id="skillCurrent" type="number" min="0" max="99" value="20"></label>
+              <label>Target level <input id="skillTarget" type="number" min="1" max="100" value="40"></label>
+              <div class="calc-result"><strong id="skillXp">—</strong><span>approx. XP required between those levels</span></div>
+            </div>
+            <p class="tiny">XP gained per action differs by skill and action, so this is useful as a progression estimate rather than a time estimate.</p>
+          </div>
+          <div id="skills" class="skill-grid"></div>
+        </div>
+      </details>
     </section>
 
     <section class="section sources">
       <div class="section-head">
-        <div><div class="eyebrow">RESEARCH</div><h2>Version notes & sources</h2></div>
+        <div><div class="eyebrow">RESEARCH</div><h2>Sources & version notes</h2></div>
       </div>
-      <p>This tracker targets the live Valheim 1.0 line after the Deep North launch. Some older wikis still describe Deep North as unfinished, so endgame data is intentionally weighted toward current 1.0 game-data references and post-launch guides.</p>
+      <p>This guide targets the live Valheim 1.0 line. Endgame guidance uses post-launch sources because many older guides still describe the final biome as unfinished.</p>
       <div id="sources" class="source-grid"></div>
     </section>
   </main>
 
   <footer>Unofficial fan guide. Valheim and its game assets belong to Iron Gate AB. No game assets are redistributed here.</footer>
+
   <script src="data.js"></script>
   <script src="app.js"></script>
 </body>
