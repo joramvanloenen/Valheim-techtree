@@ -4126,3 +4126,131 @@ body{
 .complete-action input:checked + span .markdone-fire{
   opacity:0;
 }
+
+
+/* ---------- temporary flame tuning controls ---------- */
+
+.fire-tuner{
+  margin-top:7px;
+  border-top:1px solid rgba(126,105,74,.20);
+}
+
+.fire-tuner>summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:8px 2px 3px;
+  list-style:none;
+  cursor:pointer;
+}
+
+.fire-tuner>summary::-webkit-details-marker{
+  display:none;
+}
+
+.fire-tuner>summary span{
+  display:flex;
+  align-items:baseline;
+  gap:7px;
+}
+
+.fire-tuner>summary strong{
+  color:#bda06e;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
+.fire-tuner>summary small{
+  color:#756f62;
+  font-size:9px;
+}
+
+.fire-tuner>summary>b{
+  color:#847966;
+  font-size:12px;
+  transition:transform .18s ease;
+}
+
+.fire-tuner[open]>summary>b{
+  transform:rotate(180deg);
+}
+
+.fire-tuner-body{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px 14px;
+  padding:10px 2px 4px;
+}
+
+.fire-tuner-body label{
+  display:grid;
+  gap:5px;
+  min-width:0;
+}
+
+.fire-tuner-body label>span{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  color:#b8b09c;
+  font-size:10px;
+  font-weight:650;
+}
+
+.fire-tuner-body output{
+  min-width:34px;
+  color:#d8b66f;
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+
+.fire-tuner-body input[type="range"]{
+  width:100%;
+  accent-color:#b5653d;
+}
+
+.fire-tuner-body button{
+  grid-column:1/-1;
+  justify-self:start;
+  padding:6px 8px;
+  border:1px solid #4a4437;
+  border-radius:7px;
+  background:#151610;
+  color:#9f9785;
+  font-size:9px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.fire-tuner-body button:hover{
+  border-color:#756249;
+  color:#d1bea0;
+}
+
+@media(max-width:560px){
+  .fire-tuner{
+    margin-top:6px;
+  }
+
+  .fire-tuner>summary{
+    padding-top:7px;
+  }
+
+  .fire-tuner-body{
+    grid-template-columns:1fr;
+    gap:8px;
+    padding-top:8px;
+  }
+
+  .fire-tuner-body button{
+    grid-column:auto;
+  }
+
+  .fire-tuner-body label>span{
+    font-size:10px;
+  }
+}
