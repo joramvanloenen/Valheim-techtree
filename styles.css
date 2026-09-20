@@ -2568,3 +2568,138 @@ footer{
     font-size:10px;
   }
 }
+
+
+/* ---------- flatten nested UI surfaces ---------- */
+
+/* Resource requirements: one surface per resource, no nested pills/borders. */
+.compact-quest .need-chips > .need-item{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  align-items:stretch;
+  gap:0;
+  overflow:hidden;
+  padding:0;
+  border:0;
+  border-radius:8px;
+  background:rgba(145,220,229,.075);
+  box-shadow:none;
+}
+
+.compact-quest .need-chips > .need-item .need-qty{
+  min-width:44px;
+  padding:7px 9px;
+  border:0;
+  border-radius:0;
+  background:rgba(145,220,229,.15);
+  box-shadow:none;
+}
+
+.compact-quest .need-chips > .need-item .need-name{
+  display:block;
+  width:auto;
+  max-width:none;
+  min-width:0;
+  padding:7px 10px;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  color:#e4efec;
+}
+
+.compact-quest .need-chips > .need-item .need-name small{
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+}
+
+/* Keep the main completion control as the only strong bordered action. */
+.compact-actions{
+  gap:4px;
+}
+
+.compact-actions .skip-action{
+  border:0;
+  border-radius:0;
+  background:transparent;
+  padding:9px 2px;
+  color:var(--text-soft);
+}
+
+.compact-actions .skip-action:hover{
+  border:0;
+  background:transparent;
+  color:#fff;
+}
+
+/* Explanatory content should read as content, not more cards. */
+.visible-details{
+  border-top:1px solid rgba(120,145,143,.22);
+}
+
+.visible-details .unlock-line{
+  border-top:1px solid rgba(120,145,143,.16);
+}
+
+.visible-checklist .action-steps{
+  gap:0;
+}
+
+.visible-checklist .action-steps li,
+.visible-checklist .action-steps li:first-child{
+  padding:9px 0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+}
+
+.visible-checklist .action-steps li+li{
+  border-top:1px solid rgba(120,145,143,.15);
+}
+
+.visible-checklist .action-steps li>span{
+  border:0;
+  background:rgba(145,220,229,.10);
+}
+
+/* Dropdowns keep a boundary because they are interactive, but only one. */
+.where-to-get{
+  border-color:rgba(120,145,143,.30);
+  background:rgba(8,16,17,.28);
+}
+
+.where-to-get[open]>summary{
+  background:rgba(145,220,229,.035);
+}
+
+@media(max-width:560px){
+  .compact-quest .need-chips{
+    gap:6px 8px;
+  }
+
+  .compact-quest .need-chips > .need-item{
+    min-height:0;
+  }
+
+  .compact-quest .need-chips > .need-item .need-qty{
+    min-width:42px;
+    padding:7px 8px;
+  }
+
+  .compact-quest .need-chips > .need-item .need-name{
+    padding:7px 9px;
+    font-size:12px;
+  }
+
+  .visible-checklist .action-steps li,
+  .visible-checklist .action-steps li:first-child{
+    padding:8px 0;
+  }
+
+  .compact-actions .skip-action{
+    padding:9px 2px 4px;
+  }
+}
