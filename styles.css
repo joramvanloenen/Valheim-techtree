@@ -4077,3 +4077,52 @@ body{
     opacity:.90;
   }
 }
+
+
+/* ---------- refined flame button contrast ---------- */
+
+.complete-action>span{
+  background:
+    linear-gradient(180deg,rgba(255,213,159,.035),rgba(55,18,12,.10)),
+    #743a27;
+  box-shadow:
+    inset 0 1px 0 rgba(255,226,187,.08),
+    0 8px 22px rgba(64,28,18,.24);
+}
+
+.complete-action:hover>span{
+  background:
+    linear-gradient(180deg,rgba(255,220,171,.045),rgba(62,20,13,.08)),
+    #82422b;
+  box-shadow:
+    inset 0 1px 0 rgba(255,230,193,.10),
+    0 10px 26px rgba(72,31,19,.27);
+}
+
+.markdone-fire{
+  opacity:1;
+  mix-blend-mode:normal;
+}
+
+.complete-action>span>b{
+  background:rgba(36,16,12,.20);
+  border-color:rgba(246,224,190,.86);
+}
+
+.complete-action>span>strong{
+  text-shadow:0 1px 2px rgba(38,13,8,.45);
+}
+
+.complete-action>span>small{
+  text-shadow:0 1px 1px rgba(38,13,8,.32);
+}
+
+.complete-action input:checked + span{
+  background:
+    linear-gradient(180deg,rgba(241,235,198,.05),transparent 55%),
+    #617845;
+}
+
+.complete-action input:checked + span .markdone-fire{
+  opacity:0;
+}
