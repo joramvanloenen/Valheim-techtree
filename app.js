@@ -245,35 +245,37 @@
           ${side ? `<button class="skip-action" data-skip="${m.id}">Skip <span>→</span><small>Optional for progression</small></button>` : ""}
         </div>
 
-        <details class="quest-more">
+        <section class="visible-details">
+          <div class="detail-intro">
+            <div class="section-label">WHY THIS STEP</div>
+            <p>${m.summary}</p>
+            <div class="unlock-line"><span>UNLOCKS</span><strong>${m.unlock}</strong></div>
+          </div>
+
+          <div class="detail-block visible-checklist">
+            <div class="section-label">QUICK CHECKLIST</div>
+            <ol class="action-steps">
+              <li><span>1</span><div><strong>Prepare</strong><p>Gather the requirements listed above.</p></div></li>
+              <li><span>2</span><div><strong>Execute</strong><p>${m.do}.</p></div></li>
+              <li><span>3</span><div><strong>Confirm</strong><p>Mark it done when the objective is finished in your world.</p></div></li>
+            </ol>
+          </div>
+        </section>
+
+        <details class="where-to-get">
           <summary>
-            <span>More details</span>
-            <small>Why this matters, where to get items, and extra guidance</small>
+            <span>
+              <strong>Where to get it</strong>
+              <small>Locations, drops and crafting routes</small>
+            </span>
             <b>⌄</b>
           </summary>
-          <div class="quest-more-content">
-            <div class="detail-intro">
-              <p>${m.summary}</p>
-              <div class="unlock-line"><span>UNLOCKS</span><strong>${m.unlock}</strong></div>
-            </div>
-
-            <div class="detail-block">
-              <div class="section-label">WHERE TO GET IT</div>
-              ${guides.length ? `
-                <div class="acquisition-grid">
-                  ${guides.map(([name,tip]) => `<div class="acquisition"><div class="acquisition-name">${name}</div><p>${tip}</p></div>`).join("")}
-                </div>`
-              : `<div class="acquisition fallback"><div class="acquisition-name">Follow the previous unlock</div><p>${m.summary} Your immediate action is: ${m.do}.</p></div>`}
-            </div>
-
-            <div class="detail-block">
-              <div class="section-label">QUICK CHECKLIST</div>
-              <ol class="action-steps">
-                <li><span>1</span><div><strong>Prepare</strong><p>Gather the requirements listed above.</p></div></li>
-                <li><span>2</span><div><strong>Execute</strong><p>${m.do}.</p></div></li>
-                <li><span>3</span><div><strong>Confirm</strong><p>Mark it done when the objective is finished in your world.</p></div></li>
-              </ol>
-            </div>
+          <div class="where-to-get-body">
+            ${guides.length ? `
+              <div class="acquisition-grid">
+                ${guides.map(([name,tip]) => `<div class="acquisition"><div class="acquisition-name">${name}</div><p>${tip}</p></div>`).join("")}
+              </div>`
+            : `<div class="acquisition fallback"><div class="acquisition-name">Follow the previous unlock</div><p>${m.summary} Your immediate action is: ${m.do}.</p></div>`}
           </div>
         </details>
       </div>
