@@ -1822,3 +1822,163 @@ footer{
     font-size:21px;
   }
 }
+
+
+/* ---------- completion state + mobile readability ---------- */
+
+/* Unchecked is neutral. Green only appears after the checkbox is actually checked. */
+.complete-action>span{
+  border-color:var(--line-strong);
+  background:#0c1415;
+}
+
+.complete-action>span>b{
+  position:relative;
+  border:2px solid #65736f;
+  background:transparent;
+  color:transparent;
+}
+
+.complete-action>span>b::after{
+  content:"";
+}
+
+.complete-action input:checked + span{
+  border-color:#5f8258;
+  background:var(--green-soft);
+}
+
+.complete-action input:checked + span>b{
+  border-color:var(--green);
+  background:var(--green);
+  color:#10180e;
+}
+
+.complete-action input:checked + span>b::after{
+  content:"✓";
+}
+
+.complete-action input:focus-visible + span{
+  outline:2px solid var(--ice);
+  outline-offset:2px;
+}
+
+.complete-action:hover>span{
+  border-color:#5c7475;
+  background:#101a1b;
+}
+
+.complete-action input:checked + span:hover{
+  border-color:#77a06f;
+  background:rgba(155,199,126,.17);
+}
+
+@media(max-width:560px){
+  .hero .eyebrow{
+    font-size:9px;
+  }
+
+  .compact-meta{
+    font-size:10px;
+    line-height:1.25;
+  }
+
+  .essential-action>span{
+    font-size:9px;
+  }
+
+  .essential-action>strong{
+    font-size:14px;
+    line-height:1.42;
+  }
+
+  .essential-needs .section-label{
+    font-size:9px;
+  }
+
+  .compact-quest .need-chips span{
+    font-size:11px;
+    line-height:1.35;
+  }
+
+  .compact-actions .complete-action>span{
+    min-height:48px;
+    grid-template-columns:30px minmax(0,1fr);
+    column-gap:9px;
+    padding:8px 10px;
+  }
+
+  .compact-actions .complete-action>span>b{
+    width:28px;
+    height:28px;
+    border-radius:7px;
+    font-size:14px;
+  }
+
+  .compact-actions .complete-action>span>strong{
+    font-size:13px;
+  }
+
+  .compact-actions .complete-action>span>small{
+    font-size:10px;
+  }
+
+  .compact-actions .skip-action{
+    font-size:12px;
+  }
+
+  .compact-actions .skip-action small{
+    font-size:10px;
+  }
+
+  .quest-more summary>span{
+    font-size:12px;
+  }
+
+  .progress-row small,
+  .progress-row>strong{
+    font-size:10px;
+  }
+
+  .route-drawer>summary strong{
+    font-size:12px;
+  }
+
+  .journey-tools strong{
+    font-size:13px;
+  }
+
+  .tool-actions button{
+    font-size:11px;
+  }
+
+  .spoiler-reference summary strong{
+    font-size:15px;
+  }
+
+  .spoiler-reference summary small{
+    font-size:12px;
+  }
+
+  .spoiler-pill{
+    font-size:10px;
+  }
+
+  .skill-explainer span,
+  .skill strong,
+  .station .max,
+  .mile-sub{
+    font-size:12px;
+  }
+
+  .upgrade div strong{
+    font-size:13px;
+  }
+
+  .upgrade span,
+  .skill span,
+  .source-grid small,
+  .tiny{
+    font-size:11px;
+  }
+}
