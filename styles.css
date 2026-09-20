@@ -3453,3 +3453,424 @@ body{
     line-height:1.15;
   }
 }
+
+
+/* ---------- Valheim-inspired earthy palette ---------- */
+
+:root{
+  --bg:#0b100d;
+  --panel:#171914;
+  --panel-raised:#1d2019;
+  --panel-deep:#10130f;
+
+  --line:#3b4034;
+  --line-strong:#555b46;
+
+  --text:#eee7d2;
+  --text-soft:#d1c9b4;
+  --muted:#938f7e;
+
+  --gold:#d5ae61;
+  --gold-soft:rgba(213,174,97,.13);
+
+  --ice:#8faeaa;
+  --ice-soft:rgba(143,174,170,.11);
+
+  --green:#869d5a;
+  --green-soft:rgba(134,157,90,.15);
+
+  --violet:#a98d68;
+  --violet-soft:rgba(169,141,104,.10);
+
+  --rust:#b65d3e;
+  --rust-soft:rgba(182,93,62,.12);
+
+  --blue:#839fa2;
+  --blue-soft:rgba(131,159,162,.10);
+
+  --moss:#8e9958;
+  --moss-soft:rgba(142,153,88,.12);
+
+  --action:#b9683e;
+  --action-hover:#c87849;
+  --action-dark:#9f5132;
+}
+
+body{
+  background:
+    radial-gradient(circle at 84% -10%,rgba(80,101,91,.18) 0,transparent 31%),
+    radial-gradient(circle at -8% 44%,rgba(111,88,49,.13) 0,transparent 27%),
+    linear-gradient(180deg,#101511 0%,#0a0f0c 56%,#0c100d 100%);
+  color:var(--text);
+}
+
+/* Header: soot, timber and old parchment */
+.hero{
+  border-bottom-color:#34392e;
+  background:
+    linear-gradient(105deg,rgba(120,91,49,.11),transparent 46%),
+    linear-gradient(180deg,#161b16,#0e130f);
+}
+
+.hero h1{
+  color:#eee4c9;
+}
+
+.hero h1 span{
+  color:#b8c29a;
+}
+
+.hero .eyebrow{
+  color:#c89a52;
+}
+
+/* Objective card */
+.compact-quest{
+  border-color:#48503d;
+  background:#151914;
+}
+
+.compact-quest-head{
+  background:
+    linear-gradient(115deg,rgba(112,121,68,.17),rgba(132,92,46,.08) 50%,transparent 76%),
+    #181b15;
+}
+
+.compact-quest-head .objective-main{
+  color:#efe5c6;
+}
+
+.quest-context{
+  color:#97978a;
+}
+
+.quest-context .quest-context-biome{
+  color:#abb679;
+}
+
+/* Requirements: cold grey-blue, like frost/iron rather than neon cyan */
+.essential-needs .section-label{
+  color:#9bb7b2;
+}
+
+.compact-quest .need-chips > .need-item{
+  background:rgba(93,119,116,.13);
+}
+
+.compact-quest .need-chips > .need-item .need-qty{
+  background:rgba(123,153,148,.18);
+  color:#c0d2ce;
+}
+
+.compact-quest .need-chips > .need-item .need-name{
+  color:#e2dfd0;
+}
+
+/* Primary action: ember/clay orange; completion still moss green */
+.complete-action>span{
+  background:
+    linear-gradient(135deg,rgba(255,226,184,.07),transparent 50%),
+    var(--action-dark);
+  box-shadow:0 8px 22px rgba(86,39,24,.25);
+}
+
+.complete-action>span>b{
+  border-color:rgba(247,228,198,.78);
+  background:rgba(59,26,17,.22);
+}
+
+.complete-action>span>strong{
+  color:#fff1d9;
+}
+
+.complete-action>span>small{
+  color:rgba(255,237,211,.72);
+}
+
+.complete-action:hover>span{
+  background:
+    linear-gradient(135deg,rgba(255,232,198,.09),transparent 50%),
+    var(--action-hover);
+  box-shadow:0 10px 26px rgba(101,48,28,.28);
+}
+
+.complete-action input:checked + span{
+  background:
+    linear-gradient(135deg,rgba(241,235,198,.06),transparent 50%),
+    #617845;
+  box-shadow:0 8px 22px rgba(42,67,34,.22);
+}
+
+.complete-action input:checked + span>b{
+  border-color:#dde5c3;
+  background:#a9bb79;
+  color:#233017;
+}
+
+.complete-action input:checked + span:hover{
+  background:
+    linear-gradient(135deg,rgba(241,235,198,.08),transparent 50%),
+    #6c8350;
+}
+
+/* Unlocks: weathered brass rather than purple */
+.unlock-line span,
+.visible-details .standalone-unlock span{
+  color:#9d865f;
+}
+
+.unlock-line strong,
+.visible-details .standalone-unlock strong{
+  color:#d5bd8c;
+}
+
+/* Checklist numbering: iron / frost tint */
+.visible-checklist .action-steps li>span{
+  background:rgba(118,143,140,.12);
+  color:#a9c2bd;
+}
+
+/* Where to get it: muted cold metal */
+.where-to-get{
+  border-color:rgba(111,137,132,.32);
+  background:rgba(16,23,20,.72);
+}
+
+.where-to-get>summary strong,
+.acquisition-name{
+  color:#a8c1bc;
+}
+
+.where-to-get[open]>summary{
+  background:rgba(105,130,125,.07);
+}
+
+.acquisition{
+  border-color:#343f39;
+  background:#111712;
+}
+
+/* Core progress = brass/moss; journey = cold slate */
+.status-panel{
+  border-color:#43483a;
+  background:#111510;
+}
+
+.status-core{
+  background:
+    linear-gradient(135deg,rgba(176,132,59,.18),rgba(104,91,49,.08)),
+    #1a1912;
+}
+
+.status-heading>span,
+.status-progress-line>strong{
+  color:#d6ad5f;
+}
+
+.status-progress-line .progress-track{
+  background:#13150f;
+  border-color:#343628;
+}
+
+.progress-track>div{
+  background:linear-gradient(90deg,#788d50,#c09d55);
+}
+
+.status-route{
+  border-color:#394843;
+  background:
+    linear-gradient(135deg,rgba(101,127,125,.16),rgba(69,88,85,.06)),
+    #121817;
+}
+
+.status-route>summary strong,
+.status-route>summary>b{
+  color:#9bb5b0;
+}
+
+.status-route .biome-node.current .biome-dot{
+  border-color:#91aaa4;
+  color:#b9ccc8;
+  box-shadow:0 0 0 5px rgba(137,164,159,.07);
+}
+
+/* Utility surfaces */
+.journey-tools{
+  background:
+    linear-gradient(135deg,rgba(87,83,64,.06),transparent),
+    #151914;
+}
+
+.ghost{
+  border-color:#41463a;
+  background:#121611;
+  color:#bfb8a4;
+}
+
+/* Codex: leather / parchment, no purple */
+.library-drawer{
+  border-color:#4a4134;
+  background:
+    linear-gradient(135deg,rgba(118,88,53,.09),transparent 44%),
+    #171610;
+}
+
+.library-drawer>summary strong{
+  color:#dbc9a6;
+}
+
+.library-drawer>summary>b{
+  color:#aa8c63;
+}
+
+.library-drawer[open]>summary{
+  background:rgba(128,91,51,.08);
+  border-bottom-color:#4a4134;
+}
+
+.library-drawer[open]>summary>b{
+  color:#c5a16f;
+}
+
+.library-section-title>span{
+  color:#b28e5e;
+}
+
+.library-section-title>strong{
+  color:#ded3bb;
+}
+
+.library-section+.library-section{
+  border-top-color:#3e392f;
+}
+
+.spoiler-reference{
+  border-color:#403a30;
+  background:#15150f;
+}
+
+.spoiler-reference summary:hover{
+  background:#1b1a13;
+}
+
+.spoiler-pill{
+  border-color:#79442f;
+  color:#d98967;
+  background:rgba(167,76,48,.08);
+}
+
+.spoiler-pill.soft{
+  border-color:#625642;
+  color:#c6ad82;
+  background:rgba(153,126,83,.08);
+}
+
+.station,
+.skill,
+.source-grid a{
+  background:#151711;
+  border-color:#3d4034;
+}
+
+.station .eyebrow,
+.calc-result strong{
+  color:#bba06e;
+}
+
+.skill-calculator input{
+  background:#10120e;
+  border-color:#46483b;
+  color:#e7dfc9;
+}
+
+.skill-calculator input:focus{
+  border-color:#8f7954;
+}
+
+.library-sources .library-section-title>span{
+  color:#8fa9a5;
+}
+
+.source-grid a:hover{
+  border-color:#677c76;
+  background:#181c17;
+}
+
+/* Reset / danger = ember red */
+.top-reset{
+  border-color:rgba(174,83,55,.42);
+  background:rgba(47,27,20,.44);
+  color:#cf8062;
+}
+
+.top-reset:hover{
+  border-color:rgba(190,92,59,.67);
+  background:rgba(70,36,25,.62);
+  color:#e49a79;
+}
+
+.reset-dialog{
+  border-color:#594538;
+  background:#171814;
+}
+
+.reset-dialog-icon{
+  background:rgba(182,93,62,.12);
+  color:#d47b5b;
+}
+
+.dialog-cancel{
+  border-color:#41463a;
+  background:#111510;
+  color:#c8c0ac;
+}
+
+.dialog-confirm{
+  background:#984a32;
+  color:#f4e7d4;
+}
+
+.dialog-confirm:hover{
+  background:#ad5739;
+}
+
+/* General secondary text */
+.compact-meta,
+.need-name small,
+.status-note,
+.where-to-get>summary small,
+.action-steps p,
+.library-drawer>summary small,
+.spoiler-reference summary small{
+  color:#938f7e;
+}
+
+@media(max-width:560px){
+  .hero{
+    background:
+      linear-gradient(105deg,rgba(122,91,48,.10),transparent 54%),
+      linear-gradient(180deg,#171b16,#0e130f);
+  }
+
+  .compact-quest{
+    border-color:#4b5240;
+  }
+
+  .compact-quest-head{
+    background:
+      linear-gradient(120deg,rgba(112,121,68,.16),rgba(132,92,46,.07) 58%,transparent),
+      #181b15;
+  }
+
+  .status-core{
+    background:
+      linear-gradient(120deg,rgba(176,132,59,.18),rgba(104,91,49,.07)),
+      #1a1912;
+  }
+
+  .status-route{
+    background:
+      linear-gradient(120deg,rgba(101,127,125,.16),rgba(69,88,85,.06)),
+      #121817;
+  }
+}
