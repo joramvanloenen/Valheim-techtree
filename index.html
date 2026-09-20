@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0e1516">
   <meta name="description" content="A spoiler-safe, step-by-step Valheim 1.0 progression guide.">
   <title>Valheim Progression Guide — The Viking Path</title>
-  <link rel="stylesheet" href="styles.css?v=20260920-5">
+  <link rel="stylesheet" href="styles.css?v=20260920-6">
 </head>
 <body>
   <div class="mist mist-a"></div><div class="mist mist-b"></div>
@@ -30,28 +30,32 @@
   <main>
     <section id="roadmap" class="roadmap"></section>
 
-    <section class="dashboard panel compact-dashboard">
-      <div class="progress-copy">
-        <div class="progress-row">
-          <div><span id="progressPercent">0%</span><small>core path</small></div>
+    <section class="status-panel">
+      <div class="status-core">
+        <div class="status-heading">
+          <span>CORE PATH</span>
           <strong id="stepNumber">Step 1</strong>
         </div>
-        <div class="progress-track"><div id="progressBar"></div></div>
-        <div class="progress-meta">
-          <span id="coreProgress">No core milestones completed yet</span>
+        <div class="status-progress-line">
+          <strong id="progressPercent">0%</strong>
+          <div class="progress-track"><div id="progressBar"></div></div>
         </div>
+        <span id="coreProgress" class="status-note">No core milestones completed yet</span>
       </div>
-    </section>
 
-    <details class="route-drawer">
-      <summary>
-        <span><strong>Journey map</strong><small>See reached biomes and what remains hidden</small></span>
-        <b>⌄</b>
-      </summary>
-      <div class="route-drawer-body">
-        <div id="biomeRail" class="biome-rail"></div>
-      </div>
-    </details>
+      <details class="status-route">
+        <summary>
+          <span>
+            <strong>Journey map</strong>
+            <small>Reached biomes & fog of war</small>
+          </span>
+          <b>⌄</b>
+        </summary>
+        <div class="status-route-body">
+          <div id="biomeRail" class="biome-rail"></div>
+        </div>
+      </details>
+    </section>
 
     <section class="journey-tools panel">
       <div>
@@ -66,59 +70,73 @@
     </section>
     <section id="history" class="history panel" hidden></section>
 
-    <section class="section reference-section">
-      <div class="section-head">
-        <div><div class="eyebrow">OPTIONAL REFERENCE</div><h2>Codex</h2></div>
-        <p>The guide above stays spoiler-safe. Open these only when you deliberately want the full reference tables.</p>
-      </div>
+    <details class="library-drawer">
+      <summary>
+        <span>
+          <strong>Codex & sources</strong>
+          <small>Crafting, skills, version notes and research links</small>
+        </span>
+        <b>⌄</b>
+      </summary>
 
-      <details class="spoiler-reference">
-        <summary>
-          <span><strong>Crafting station ladder</strong><small>Contains future station and material names</small></span>
-          <span class="spoiler-pill">SPOILERS</span>
-        </summary>
-        <div class="reference-body">
-          <div id="stations" class="station-grid"></div>
-        </div>
-      </details>
-
-      <details class="spoiler-reference">
-        <summary>
-          <span><strong>Skills & leveling reference</strong><small>24 skills, death penalty and XP calculator</small></span>
-          <span class="spoiler-pill soft">REFERENCE</span>
-        </summary>
-        <div class="reference-body">
-          <div class="skill-explainer panel inset">
-            <div><strong>24 skills</strong><span>Each independently caps at 100</span></div>
-            <div><strong>Use it to level it</strong><span>Weapons, movement, crafting and professions train separately</span></div>
-            <div><strong>Death matters</strong><span>Default death penalty removes about 5% from every skill, followed by a no-skill-drain grace period</span></div>
+      <div class="library-body">
+        <section class="library-section">
+          <div class="library-section-title">
+            <span>CODEX</span>
+            <strong>Reference</strong>
           </div>
-          <div class="skill-planner panel inset">
-            <div class="skill-calculator">
-              <div><div class="eyebrow">XP CURVE</div><h3>Skill level calculator</h3></div>
-              <label>Current level <input id="skillCurrent" type="number" min="0" max="99" value="20"></label>
-              <label>Target level <input id="skillTarget" type="number" min="1" max="100" value="40"></label>
-              <div class="calc-result"><strong id="skillXp">—</strong><span>approx. XP required between those levels</span></div>
+
+          <details class="spoiler-reference">
+            <summary>
+              <span><strong>Crafting station ladder</strong><small>Contains future station and material names</small></span>
+              <span class="spoiler-pill">SPOILERS</span>
+            </summary>
+            <div class="reference-body">
+              <div id="stations" class="station-grid"></div>
             </div>
-            <p class="tiny">XP gained per action differs by skill and action, so this is useful as a progression estimate rather than a time estimate.</p>
-          </div>
-          <div id="skills" class="skill-grid"></div>
-        </div>
-      </details>
-    </section>
+          </details>
 
-    <section class="section sources">
-      <div class="section-head">
-        <div><div class="eyebrow">RESEARCH</div><h2>Sources & version notes</h2></div>
+          <details class="spoiler-reference">
+            <summary>
+              <span><strong>Skills & leveling</strong><small>24 skills, death penalty and XP calculator</small></span>
+              <span class="spoiler-pill soft">REFERENCE</span>
+            </summary>
+            <div class="reference-body">
+              <div class="skill-explainer panel inset">
+                <div><strong>24 skills</strong><span>Each independently caps at 100</span></div>
+                <div><strong>Use it to level it</strong><span>Weapons, movement, crafting and professions train separately</span></div>
+                <div><strong>Death matters</strong><span>Default death penalty removes about 5% from every skill, followed by a no-skill-drain grace period</span></div>
+              </div>
+              <div class="skill-planner panel inset">
+                <div class="skill-calculator">
+                  <div><div class="eyebrow">XP CURVE</div><h3>Skill level calculator</h3></div>
+                  <label>Current level <input id="skillCurrent" type="number" min="0" max="99" value="20"></label>
+                  <label>Target level <input id="skillTarget" type="number" min="1" max="100" value="40"></label>
+                  <div class="calc-result"><strong id="skillXp">—</strong><span>approx. XP required between those levels</span></div>
+                </div>
+                <p class="tiny">XP gained per action differs by skill and action, so this is useful as a progression estimate rather than a time estimate.</p>
+              </div>
+              <div id="skills" class="skill-grid"></div>
+            </div>
+          </details>
+        </section>
+
+        <section class="library-section library-sources">
+          <div class="library-section-title">
+            <span>SOURCES</span>
+            <strong>Research & version notes</strong>
+          </div>
+          <p>This guide targets the live Valheim 1.0 line. Endgame guidance uses post-launch sources because many older guides still describe the final biome as unfinished.</p>
+          <div id="sources" class="source-grid"></div>
+        </section>
       </div>
-      <p>This guide targets the live Valheim 1.0 line. Endgame guidance uses post-launch sources because many older guides still describe the final biome as unfinished.</p>
-      <div id="sources" class="source-grid"></div>
+    </details>
     </section>
   </main>
 
   <footer>Unofficial fan guide. Valheim and its game assets belong to Iron Gate AB. No game assets are redistributed here.</footer>
 
-  <script src="data.js?v=20260920-5"></script>
-  <script src="app.js?v=20260920-5"></script>
+  <script src="data.js?v=20260920-6"></script>
+  <script src="app.js?v=20260920-6"></script>
 </body>
 </html>
