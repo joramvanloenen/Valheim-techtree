@@ -386,23 +386,45 @@
         vec2 uv = v_uv;
         float t = u_time;
 
-        float drift = sin(uv.y * 8.0 + t * 1.35) * 0.055;
-        vec2 p = vec2((uv.x + drift) * 4.3, uv.y * 3.25 - t * 0.72);
+        float coarse = fbm(vec2(uv.x * 5.0, uv.y * 3.2 - t * 0.62));
+        float fine = fbm(vec2(uv.x * 13.0 - t * 0.05, uv.y * 7.4 - t * 1.25));
 
-        float large = fbm(p);
-        float detail = fbm(vec2(uv.x * 8.5 - t * 0.08, uv.y * 6.2 - t * 1.18));
-        float center = 1.0 - abs(uv.x - 0.5) * 0.28;
-        float vertical = 1.0 - uv.y;
+        // Break the fire into narrow, independently moving tongues.
+        float xWarp =
+          (coarse - 0.5) * 0.095 +
+          sin(uv.y * 11.0 + t * 1.7 + uv.x * 7.0) * 0.018;
 
-        float field = vertical * 0.82 + large * 0.62 + detail * 0.18 + center * 0.08;
-        float flame = smoothstep(0.62, 0.92, field);
+        float columnCount = 9.0;
+        float columnX = (uv.x + xWarp) * columnCount;
+        float columnId = floor(columnX);
+        float localX = abs(fract(columnX) - 0.5) * 2.0;
 
-        float topFade = 1.0 - smoothstep(0.62, 1.0, uv.y);
-        float bottomFade = smoothstep(-0.08, 0.10, uv.y);
-        flame *= topFade * bottomFade;
+        float rnd = hash(vec2(columnId, 4.73));
+        float width = mix(0.24, 0.46, rnd);
+        float tongueMask = 1.0 - smoothstep(width, width + 0.16, localX);
 
-        float core = smoothstep(0.82, 1.12, field) * (1.0 - smoothstep(0.0, 0.58, uv.y));
-        float rim = smoothstep(0.58, 0.78, field) - smoothstep(0.82, 0.98, field);
+        float pulse = 0.5 + 0.5 * sin(t * mix(1.05, 1.8, rnd) + rnd * 6.2831);
+        float tongueHeight = mix(0.42, 0.78, rnd) + pulse * 0.11;
+        float raggedTop = (coarse - 0.5) * 0.16 + (fine - 0.5) * 0.07;
+        float heightMask = 1.0 - smoothstep(tongueHeight - 0.13, tongueHeight, uv.y + raggedTop);
+
+        // Keep a very small common base so the tongues feel connected to one fire.
+        float base = (1.0 - smoothstep(0.0, 0.15, uv.y)) * 0.28;
+        float body = clamp(tongueMask * heightMask + base, 0.0, 1.0);
+
+        float turbulence = 0.66 + coarse * 0.34 + fine * 0.12;
+        float flame = smoothstep(0.30, 0.82, body * turbulence);
+
+        float bottomFade = smoothstep(-0.03, 0.06, uv.y);
+        flame *= bottomFade;
+
+        float core =
+          smoothstep(0.50, 0.96, body * (0.76 + coarse * 0.34)) *
+          (1.0 - smoothstep(0.0, 0.46, uv.y));
+
+        float rim =
+          smoothstep(0.22, 0.56, body * turbulence) -
+          smoothstep(0.61, 0.88, body * turbulence);
 
         vec3 ember = vec3(0.47, 0.075, 0.018);
         vec3 orange = vec3(0.96, 0.25, 0.035);
