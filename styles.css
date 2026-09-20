@@ -2307,3 +2307,194 @@ footer{
     font-size:13px;
   }
 }
+
+
+/* ---------- visible quest details + acquisition dropdown ---------- */
+
+.visible-details{
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px solid var(--line);
+}
+
+.visible-details .detail-intro{
+  max-width:none;
+}
+
+.visible-details .detail-intro>.section-label{
+  margin-bottom:6px;
+  color:var(--gold);
+  font-size:9px;
+}
+
+.visible-details .detail-intro>p{
+  max-width:64ch;
+  margin:0;
+  color:var(--text-soft);
+  font-size:12px;
+  line-height:1.55;
+}
+
+.visible-details .unlock-line{
+  margin-top:9px;
+  padding-top:9px;
+}
+
+.visible-checklist{
+  margin-top:14px;
+}
+
+.visible-checklist>.section-label{
+  margin-bottom:6px;
+  color:var(--muted);
+  font-size:9px;
+}
+
+.visible-checklist .action-steps{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+}
+
+.visible-checklist .action-steps li{
+  display:grid;
+  grid-template-columns:24px minmax(0,1fr);
+  gap:8px;
+  padding:9px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:#0b1314;
+}
+
+.visible-checklist .action-steps li:first-child{
+  padding-top:9px;
+}
+
+.visible-checklist .action-steps li>span{
+  width:22px;
+  height:22px;
+  font-size:9px;
+}
+
+.visible-checklist .action-steps strong{
+  font-size:11px;
+}
+
+.visible-checklist .action-steps p{
+  margin-top:2px;
+  font-size:10px;
+  line-height:1.4;
+}
+
+.where-to-get{
+  overflow:hidden;
+  margin-top:10px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#0c1415;
+}
+
+.where-to-get>summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:10px 12px;
+  list-style:none;
+  cursor:pointer;
+}
+
+.where-to-get>summary::-webkit-details-marker{
+  display:none;
+}
+
+.where-to-get>summary strong{
+  display:block;
+  color:var(--ice);
+  font-size:12px;
+  line-height:1.3;
+}
+
+.where-to-get>summary small{
+  display:block;
+  margin-top:2px;
+  color:var(--muted);
+  font-size:10px;
+  line-height:1.35;
+}
+
+.where-to-get>summary>b{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1;
+  transition:transform .18s ease,color .18s ease;
+}
+
+.where-to-get[open]>summary{
+  border-bottom:1px solid var(--line);
+  background:#0f191a;
+}
+
+.where-to-get[open]>summary>b{
+  transform:rotate(180deg);
+  color:var(--ice);
+}
+
+.where-to-get-body{
+  padding:11px;
+}
+
+@media(max-width:700px){
+  .visible-details{
+    margin-top:12px;
+    padding-top:12px;
+  }
+
+  .visible-details .detail-intro>.section-label,
+  .visible-checklist>.section-label{
+    font-size:9px;
+  }
+
+  .visible-details .detail-intro>p{
+    font-size:12px;
+    line-height:1.5;
+  }
+
+  .visible-checklist{
+    margin-top:12px;
+  }
+
+  .visible-checklist .action-steps{
+    grid-template-columns:1fr;
+    gap:5px;
+  }
+
+  .visible-checklist .action-steps li{
+    grid-template-columns:24px minmax(0,1fr);
+    padding:7px 8px;
+  }
+
+  .visible-checklist .action-steps strong{
+    font-size:11px;
+  }
+
+  .visible-checklist .action-steps p{
+    font-size:10px;
+  }
+
+  .where-to-get{
+    margin-top:8px;
+  }
+
+  .where-to-get>summary{
+    padding:9px 10px;
+  }
+
+  .where-to-get>summary strong{
+    font-size:12px;
+  }
+
+  .where-to-get>summary small{
+    font-size:10px;
+  }
+}
