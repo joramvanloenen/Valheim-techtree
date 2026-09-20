@@ -3433,3 +3433,23 @@ body{
 .hero-inner{
   position:relative;
 }
+
+
+/* ---------- single objective line ---------- */
+
+.compact-quest-head .objective-main{
+  max-width:34ch;
+  margin:0;
+  color:#fff2c9;
+  font-size:clamp(24px,3.7vw,36px);
+  line-height:1.12;
+  letter-spacing:-.03em;
+  font-weight:800;
+}
+
+@media(max-width:560px){
+  .compact-quest-head .objective-main{
+    font-size:22px;
+    line-height:1.15;
+  }
+}
