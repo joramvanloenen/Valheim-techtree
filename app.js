@@ -401,37 +401,37 @@
           uv.y * 10.0 - t * 1.45
         ));
 
-        // Open the mask enough that fire is always visible, while noise still
-        // determines where taller licks form.
-        float pockets = smoothstep(0.34, 0.68, coarse * 0.72 + fine * 0.28);
+        // Visible but irregular flame body. Broad noise establishes the
+        // silhouette; higher-frequency noise cuts it into smaller moving licks.
+        float pockets = smoothstep(0.28, 0.60, coarse * 0.68 + fine * 0.32);
 
         float baseHeight =
-          (1.0 - uv.y) * 1.03 +
-          coarse * 0.46 +
-          fine * 0.14;
+          (1.0 - uv.y) * 1.18 +
+          coarse * 0.52 +
+          fine * 0.18;
 
-        float licks = smoothstep(0.93, 1.25, baseHeight) * pockets;
-        licks *= 1.0 - smoothstep(0.48, 0.88, uv.y);
+        float breakup = smoothstep(0.26, 0.62, fine + coarse * 0.20);
+        float licks = smoothstep(0.82, 1.14, baseHeight) * mix(0.42, 1.0, pockets * breakup);
+        licks *= 1.0 - smoothstep(0.58, 0.91, uv.y);
 
-        // Guaranteed low forge bed. This prevents the effect from disappearing
-        // when the turbulent flame mask happens to be sparse.
-        float emberNoise = 0.68 + 0.32 * noise(vec2(uv.x * 18.0 - t * 0.28, t * 1.7));
-        float fireBed = (1.0 - smoothstep(0.02, 0.22, uv.y)) * emberNoise;
+        // Always-visible forge bed across the lower quarter.
+        float emberNoise = 0.78 + 0.22 * noise(vec2(uv.x * 20.0 - t * 0.34, t * 1.9));
+        float fireBed = (1.0 - smoothstep(0.05, 0.30, uv.y)) * emberNoise;
 
-        float flame = max(licks, fireBed * 0.82);
-        flame *= smoothstep(-0.03, 0.055, uv.y);
+        float flame = max(licks, fireBed * 0.94);
+        flame *= smoothstep(-0.025, 0.045, uv.y);
 
         float core =
           max(
-            smoothstep(1.05, 1.33, baseHeight) * pockets,
-            fireBed * 0.58
+            smoothstep(1.00, 1.30, baseHeight) * pockets * breakup,
+            fireBed * 0.72
           ) *
-          (1.0 - smoothstep(0.0, 0.39, uv.y));
+          (1.0 - smoothstep(0.0, 0.48, uv.y));
 
         float rim =
-          (smoothstep(0.84, 1.00, baseHeight) -
-           smoothstep(1.14, 1.30, baseHeight)) *
-          pockets;
+          (smoothstep(0.72, 0.91, baseHeight) -
+           smoothstep(1.10, 1.28, baseHeight)) *
+          mix(0.35, 1.0, pockets);
 
         vec3 ember = vec3(0.47, 0.075, 0.018);
         vec3 orange = vec3(0.96, 0.25, 0.035);
@@ -442,8 +442,9 @@
         color = mix(color, amber, clamp(core * 1.15, 0.0, 1.0));
         color = mix(color, hot, clamp(core * core * 0.72, 0.0, 1.0));
 
-        float alpha = flame * 0.68 + core * 0.16;
-        alpha *= 0.80 + 0.20 * noise(vec2(uv.x * 14.0, t * 2.0));
+        float alpha = flame * 0.88 + core * 0.28;
+        alpha *= 0.88 + 0.12 * noise(vec2(uv.x * 14.0, t * 2.0));
+        alpha = clamp(alpha, 0.0, 0.96);
 
         gl_FragColor = vec4(color * alpha, alpha);
       }
