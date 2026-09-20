@@ -314,13 +314,13 @@
     const items = prepareItems(m);
     const side = m.type !== "core";
 
-    return `<article class="quest-card compact-quest" id="currentQuest" style="--biomeColor:${m.stage.color};--biomeTint:${m.stage.tint}">
+    return `<div class="quest-context" style="--biomeColor:${m.stage.color}">
+      <span>STEP ${globalIndex + 1}</span>
+      <span class="quest-context-biome">${m.stageName}</span>
+      <span>${typeLabel(m.type)}</span>
+    </div>
+    <article class="quest-card compact-quest" id="currentQuest" style="--biomeColor:${m.stage.color};--biomeTint:${m.stage.tint}">
       <header class="compact-quest-head">
-        <div class="compact-meta">
-          <span>STEP ${globalIndex + 1}</span>
-          <span class="compact-biome">${m.stageName}</span>
-          <span>${typeLabel(m.type)}</span>
-        </div>
         <h2>${m.title}</h2>
         <div class="essential-action">
           <span>DO</span>
@@ -345,11 +345,7 @@
         </div>
 
         <section class="visible-details">
-          <div class="detail-intro">
-            <div class="section-label">WHY THIS STEP</div>
-            <p>${m.summary}</p>
-            <div class="unlock-line"><span>UNLOCKS</span><strong>${m.unlock}</strong></div>
-          </div>
+          <div class="unlock-line standalone-unlock"><span>UNLOCKS</span><strong>${m.unlock}</strong></div>
 
           <div class="detail-block visible-checklist">
             <div class="section-label">QUICK CHECKLIST</div>
