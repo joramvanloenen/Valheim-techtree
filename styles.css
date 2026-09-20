@@ -1553,3 +1553,272 @@ footer{
     margin-top:10px;
   }
 }
+
+
+/* ---------- mobile: task first, above the fold ---------- */
+@media(max-width:560px){
+  body{
+    font-size:14px;
+  }
+
+  .mist{
+    opacity:.05;
+  }
+
+  .hero{
+    padding:12px 13px 10px;
+    min-height:0;
+  }
+
+  .hero-inner{
+    display:block;
+  }
+
+  .hero .eyebrow{
+    font-size:7px;
+    line-height:1.1;
+    letter-spacing:.12em;
+  }
+
+  .hero h1{
+    margin:3px 0 0;
+    font-size:25px;
+    line-height:1;
+    letter-spacing:-.04em;
+  }
+
+  .hero .lede,
+  .hero .badges,
+  .hero .rune-mark{
+    display:none;
+  }
+
+  main{
+    padding:8px 10px 56px;
+  }
+
+  .roadmap{
+    margin:0 0 8px;
+  }
+
+  .compact-quest{
+    border-radius:14px;
+    box-shadow:0 12px 32px rgba(0,0,0,.2);
+  }
+
+  .compact-quest-head{
+    padding:12px 12px 11px;
+  }
+
+  .compact-meta{
+    gap:5px;
+    font-size:7px;
+    letter-spacing:.075em;
+  }
+
+  .compact-meta span+span:before{
+    margin-right:5px;
+  }
+
+  .compact-quest-head h2{
+    margin:5px 0 7px;
+    font-size:23px;
+    line-height:1.04;
+    letter-spacing:-.03em;
+  }
+
+  .essential-action{
+    display:block;
+  }
+
+  .essential-action>span{
+    display:block;
+    margin-bottom:2px;
+    font-size:7px;
+  }
+
+  .essential-action>strong{
+    display:block;
+    font-size:12px;
+    line-height:1.35;
+  }
+
+  .compact-quest-body{
+    padding:10px 12px 12px;
+  }
+
+  .essential-needs .section-label{
+    margin-bottom:5px;
+    font-size:7px;
+  }
+
+  .compact-quest .need-chips{
+    gap:5px;
+  }
+
+  .compact-quest .need-chips span{
+    padding:5px 7px;
+    border-radius:7px;
+    font-size:9px;
+    line-height:1.25;
+  }
+
+  .compact-quest .need-chips span i{
+    width:4px;
+    height:4px;
+    margin-top:.42em;
+  }
+
+  .compact-actions{
+    margin-top:10px;
+    padding-top:10px;
+    gap:6px;
+  }
+
+  .compact-actions .complete-action>span{
+    min-height:44px;
+    grid-template-columns:27px minmax(0,1fr);
+    column-gap:8px;
+    padding:7px 9px;
+    border-radius:9px;
+  }
+
+  .compact-actions .complete-action>span>b{
+    width:25px;
+    height:25px;
+    border-radius:7px;
+    font-size:13px;
+  }
+
+  .compact-actions .complete-action>span>strong{
+    font-size:11px;
+    line-height:1.2;
+  }
+
+  .compact-actions .complete-action>span>small{
+    font-size:8px;
+    line-height:1.2;
+  }
+
+  .compact-actions .skip-action{
+    min-width:0;
+    padding:7px 9px;
+    border-radius:9px;
+    font-size:10px;
+  }
+
+  .compact-actions .skip-action small{
+    font-size:8px;
+  }
+
+  .quest-more{
+    margin-top:7px;
+    border-radius:9px;
+  }
+
+  .quest-more summary{
+    padding:8px 9px;
+  }
+
+  .quest-more summary>span{
+    font-size:10px;
+  }
+
+  .quest-more summary>small{
+    display:none;
+  }
+
+  .quest-more summary>b{
+    grid-row:1;
+    font-size:13px;
+  }
+
+  .quest-more-content{
+    padding:10px;
+  }
+
+  .compact-dashboard{
+    margin:8px 0;
+    padding:8px 10px;
+    border-radius:10px;
+    box-shadow:none;
+  }
+
+  .progress-row{
+    margin-bottom:5px;
+  }
+
+  .progress-row span{
+    font-size:16px;
+  }
+
+  .progress-row small,
+  .progress-row>strong{
+    font-size:8px;
+  }
+
+  .progress-track{
+    height:5px;
+  }
+
+  .compact-dashboard .progress-meta{
+    display:none;
+  }
+
+  .route-drawer{
+    margin:8px 0 10px;
+    border-radius:9px;
+  }
+
+  .route-drawer>summary{
+    padding:8px 9px;
+  }
+
+  .route-drawer>summary strong{
+    font-size:10px;
+  }
+
+  .route-drawer>summary small{
+    display:none;
+  }
+
+  .journey-tools{
+    margin-top:8px;
+    padding:10px;
+    border-radius:10px;
+    box-shadow:none;
+  }
+
+  .journey-tools .eyebrow,
+  .journey-tools p{
+    display:none;
+  }
+
+  .journey-tools strong{
+    font-size:11px;
+  }
+
+  .tool-actions{
+    width:100%;
+    gap:5px;
+  }
+
+  .tool-actions button{
+    padding:7px 8px;
+    font-size:9px;
+  }
+
+  .reference-section{
+    margin-top:32px;
+  }
+}
+
+@media(max-width:380px){
+  .hero h1{
+    font-size:23px;
+  }
+
+  .compact-quest-head h2{
+    font-size:21px;
+  }
+}
